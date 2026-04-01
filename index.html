@@ -17,7 +17,6 @@
     --text: #ffffff;
     --text2: #818384;
     --text3: #565758;
-    --accent: #538d4e;
     --mono: 'Space Mono', monospace;
     --sans: 'DM Sans', sans-serif;
   }
@@ -55,13 +54,7 @@
   }
 
   .logo-tiles { display: flex; gap: 3px; }
-
-  .logo-tile {
-    width: 14px;
-    height: 14px;
-    border-radius: 2px;
-  }
-
+  .logo-tile { width: 14px; height: 14px; border-radius: 2px; }
   .tile-g { background: var(--green); }
   .tile-y { background: var(--yellow); }
   .tile-x { background: var(--gray); }
@@ -73,14 +66,43 @@
     text-align: right;
     line-height: 1.5;
     white-space: pre;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
+
+  .admin-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 3px 8px;
+    letter-spacing: 0.06em;
+    display: none;
+  }
+  .admin-badge.visible { display: inline-block; }
+
+  .logout-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    display: none;
+    transition: color 0.1s, border-color 0.1s;
+  }
+  .logout-btn.visible { display: inline-block; }
+  .logout-btn:hover { color: #e74c3c; border-color: #e74c3c; }
 
   .main { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 0; }
 
-  /* Tabs */
   .tabs {
     display: flex;
-    gap: 0;
     border-bottom: 1px solid var(--border);
     margin-bottom: 2rem;
   }
@@ -98,27 +120,19 @@
     margin-bottom: -1px;
     transition: color 0.15s, border-color 0.15s;
   }
-
   .tab.active { color: var(--green); border-bottom-color: var(--green); }
   .tab:hover:not(.active) { color: var(--text2); }
 
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* Month nav */
-  .month-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
+  .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
 
   .month-label {
     font-family: var(--mono);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.1em;
-    text-transform: uppercase;
     color: var(--text);
   }
 
@@ -137,10 +151,8 @@
     justify-content: center;
     transition: background 0.1s, color 0.1s;
   }
-
   .month-btn:hover { background: var(--border); color: var(--text); }
 
-  /* Leaderboard */
   .leaderboard { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
 
   .player-row {
@@ -154,97 +166,32 @@
     gap: 8px;
     transition: border-color 0.15s;
   }
-
-  .player-row.no-season-pts {
-    grid-template-columns: 28px 1fr 80px 80px;
-  }
-
+  .player-row.no-season-pts { grid-template-columns: 28px 1fr 80px 80px; }
   .player-row:hover { border-color: var(--text3); }
   .player-row.leader { border-color: var(--green); }
 
-  .rank {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text3);
-    text-align: center;
-  }
-
+  .rank { font-family: var(--mono); font-size: 12px; color: var(--text3); text-align: center; }
   .rank.gold { color: #f5c518; }
 
-  .player-name {
-    font-weight: 600;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
+  .player-name { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
   .crown { font-size: 14px; }
-
   .stat-col { text-align: right; }
-
-  .stat-val {
-    font-family: var(--mono);
-    font-size: 15px;
-    color: var(--text);
-  }
-
+  .stat-val { font-family: var(--mono); font-size: 15px; color: var(--text); }
   .stat-val.good { color: var(--green); }
+  .stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
 
-  .stat-label {
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  /* Score bar */
   .score-bar-wrap { margin-top: 6px; grid-column: 2 / -1; }
-  .score-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .score-bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: var(--green);
-    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+  .score-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
-  /* Submit form */
-  .submit-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .submit-title {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 1.25rem;
-  }
-
+  .submit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .submit-title { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 1.25rem; }
   .form-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-
   .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 130px; }
 
-  label {
-    font-size: 11px;
-    color: var(--text3);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-family: var(--mono);
-  }
+  label { font-size: 11px; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--mono); }
 
-  select, textarea {
+  select, textarea, input[type="email"], input[type="password"] {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -254,17 +201,10 @@
     padding: 9px 12px;
     outline: none;
     transition: border-color 0.15s;
+    width: 100%;
   }
-
-  select:focus, textarea:focus { border-color: var(--green); }
-
-  textarea {
-    resize: vertical;
-    min-height: 90px;
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.6;
-  }
+  select:focus, textarea:focus, input:focus { border-color: var(--green); }
+  textarea { resize: vertical; min-height: 90px; font-family: var(--mono); font-size: 12px; line-height: 1.6; }
 
   .submit-btn {
     background: var(--green);
@@ -279,7 +219,6 @@
     cursor: pointer;
     transition: opacity 0.15s, transform 0.1s;
   }
-
   .submit-btn:hover { opacity: 0.88; }
   .submit-btn:active { transform: scale(0.98); }
 
@@ -298,16 +237,9 @@
     z-index: 100;
     white-space: nowrap;
   }
-
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* History */
-  .history-filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-  }
+  .history-filters { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 
   .filter-btn {
     font-family: var(--mono);
@@ -321,7 +253,6 @@
     letter-spacing: 0.04em;
     transition: all 0.1s;
   }
-
   .filter-btn.active { background: var(--surface2); border-color: var(--text3); color: var(--text); }
 
   .history-list { display: flex; flex-direction: column; gap: 6px; }
@@ -341,12 +272,7 @@
   .history-player { font-weight: 600; font-size: 14px; }
   .history-date { font-family: var(--mono); font-size: 11px; color: var(--text3); }
   .history-wordle { font-family: var(--mono); font-size: 11px; color: var(--text2); }
-
-  .history-score {
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 700;
-  }
+  .history-score { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 
   .score-1, .score-2 { color: var(--green); }
   .score-3, .score-4 { color: #8bc34a; }
@@ -366,7 +292,6 @@
   }
   .delete-btn:hover { color: #e74c3c; background: rgba(231,76,60,0.1); }
 
-  /* Points / grand prize */
   .prize-banner {
     background: linear-gradient(135deg, #1a2e1a 0%, #1a1a1b 100%);
     border: 1px solid var(--green);
@@ -383,27 +308,54 @@
   .prize-title { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
   .prize-amount { font-size: 24px; font-weight: 700; }
   .prize-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
   .points-grid { display: flex; gap: 12px; flex-wrap: wrap; }
 
-  .points-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 14px;
-    text-align: center;
-  }
-
+  .points-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; text-align: center; }
   .points-chip .p-name { font-size: 12px; color: var(--text2); margin-bottom: 2px; }
-  .points-chip .p-pts {
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-  }
+  .points-chip .p-pts { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
   .points-chip .p-pts.leading { color: var(--green); }
 
-  /* Responsive */
+  /* Admin login modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 360px;
+    margin: 1rem;
+  }
+
+  .modal-title { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 1.25rem; }
+  .modal-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; }
+
+  .cancel-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color 0.1s, color 0.1s;
+  }
+  .cancel-btn:hover { border-color: var(--text2); color: var(--text); }
+
+  .login-error { font-family: var(--mono); font-size: 12px; color: #e74c3c; margin-top: 8px; min-height: 18px; }
+
   @media (max-width: 500px) {
     .player-row { grid-template-columns: 24px 1fr 60px 60px 60px; gap: 4px; }
     .player-row.no-season-pts { grid-template-columns: 24px 1fr 60px 60px; }
@@ -425,11 +377,34 @@
     </div>
     FAMILY WORDLE
   </div>
-  <div class="header-right" id="header-date"></div>
+  <div class="header-right">
+    <span id="admin-badge" class="admin-badge">ADMIN</span>
+    <button id="logout-btn" class="logout-btn" onclick="adminLogout()">LOGOUT</button>
+    <span id="header-date"></span>
+  </div>
 </header>
 
-<div class="main">
+<!-- Admin login modal -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal">
+    <div class="modal-title">Admin Login</div>
+    <div class="modal-group">
+      <label>Email</label>
+      <input type="email" id="admin-email" placeholder="your@email.com" />
+    </div>
+    <div class="modal-group">
+      <label>Password</label>
+      <input type="password" id="admin-password" placeholder="••••••••" />
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <div class="modal-actions">
+      <button class="submit-btn" onclick="adminLogin()">LOGIN</button>
+      <button class="cancel-btn" onclick="closeAdminModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
 
+<div class="main">
   <div class="tabs">
     <button class="tab active" onclick="switchTab('leaderboard', this)">LEADERBOARD</button>
     <button class="tab" onclick="switchTab('submit', this)">SUBMIT SCORE</button>
@@ -438,24 +413,20 @@
 
   <!-- LEADERBOARD -->
   <div id="tab-leaderboard" class="tab-content active">
-
     <div class="prize-banner">
       <div class="prize-left">
         <div class="prize-title">Grand Prize</div>
-        <div class="prize-amount" id="prize-amount">$100</div>
+        <div class="prize-amount">$100</div>
         <div class="prize-sub">Lowest avg score wins each month · most points by Dec wins all</div>
       </div>
       <div class="points-grid" id="points-grid"></div>
     </div>
-
     <div class="month-nav">
       <button class="month-btn" onclick="changeMonth(-1)">&#8592;</button>
       <div class="month-label" id="month-label"></div>
       <button class="month-btn" onclick="changeMonth(1)">&#8594;</button>
     </div>
-
     <div class="leaderboard" id="leaderboard"></div>
-
   </div>
 
   <!-- SUBMIT -->
@@ -482,7 +453,7 @@
 
   <!-- HISTORY -->
   <div id="tab-history" class="tab-content">
-    <div class="history-filters" id="history-filters">
+    <div class="history-filters">
       <button class="filter-btn active" onclick="filterHistory('ALL', this)">ALL</button>
       <button class="filter-btn" onclick="filterHistory('Jeff', this)">J</button>
       <button class="filter-btn" onclick="filterHistory('Tristan', this)">T</button>
@@ -492,7 +463,6 @@
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -506,6 +476,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allScores = [];
 let scoresChannel = null;
+let isAdmin = false;
 
 const PLAYERS = ['Jeff','Tristan','Nana','Daniel','Caleb'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -514,16 +485,79 @@ const FULL_MONTHS = ['January','February','March','April','May','June','July','A
 let currentMonth = new Date().getMonth();
 let historyFilter = 'ALL';
 
-function loadData() {
-  return allScores;
+// --- Auth ---
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) setAdminState(true);
 }
+
+function setAdminState(val) {
+  isAdmin = val;
+  document.getElementById('admin-badge').classList.toggle('visible', val);
+  document.getElementById('logout-btn').classList.toggle('visible', val);
+  renderHistory();
+}
+
+async function adminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    errEl.textContent = 'Invalid email or password.';
+    return;
+  }
+
+  closeAdminModal();
+  setAdminState(true);
+  showToast('Logged in as admin');
+}
+
+async function adminLogout() {
+  await supabase.auth.signOut();
+  setAdminState(false);
+  showToast('Logged out');
+}
+
+function openAdminModal() {
+  document.getElementById('admin-modal').classList.add('visible');
+  document.getElementById('admin-email').value = '';
+  document.getElementById('admin-password').value = '';
+  document.getElementById('login-error').textContent = '';
+  setTimeout(() => document.getElementById('admin-email').focus(), 50);
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').classList.remove('visible');
+}
+
+document.getElementById('admin-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminModal();
+});
+
+document.getElementById('admin-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') adminLogin();
+});
+
+// trigger
+function checkHash() {
+  if (window.location.hash === '#admin') {
+    if (!isAdmin) openAdminModal();
+    history.replaceState(null, '', window.location.pathname);
+  }
+}
+window.addEventListener('hashchange', checkHash);
+
+// --- Data ---
+function loadData() { return allScores; }
 
 async function fetchScores() {
   const { data, error } = await supabase
     .from('scores')
     .select('*')
     .order('id', { ascending: false });
-
   if (!error) {
     allScores = data || [];
     renderAll();
@@ -534,13 +568,11 @@ function subscribeToScores() {
   if (scoresChannel) return;
   scoresChannel = supabase
     .channel('scores-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'scores' }, () => {
-      fetchScores();
-    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'scores' }, () => fetchScores())
     .subscribe();
 }
 
-// --- Parse Wordle paste ---
+// --- Parse ---
 function parseWordle(text) {
   const trimmed = text.trim();
   if (!trimmed) return null;
@@ -621,20 +653,16 @@ function computeMonthlyPoints() {
   return pts;
 }
 
-function getMonthPoints(player) {
-  return computeMonthlyPoints()[player] || 0;
-}
+function getMonthPoints(player) { return computeMonthlyPoints()[player] || 0; }
 
-// Returns true if at least one past month has been played
 function hasSeasonPoints() {
   return new Date().getMonth() > 0 && Object.values(computeMonthlyPoints()).some(v => v > 0);
 }
 
-// --- Render leaderboard ---
+// --- Leaderboard ---
 function renderLeaderboard() {
   const data = loadData();
   const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
-
   document.getElementById('month-label').textContent = FULL_MONTHS[currentMonth].toUpperCase();
 
   const showSeasonPts = hasSeasonPoints();
@@ -695,7 +723,7 @@ function renderLeaderboard() {
   });
 }
 
-// --- Prize section: always show all players ---
+// --- Prize section ---
 function renderPrizeSection() {
   const pts = computeMonthlyPoints();
   const maxPts = Math.max(...Object.values(pts));
@@ -726,6 +754,9 @@ function renderHistory() {
     const dateStr = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
     const scoreClass = e.score === 'X' ? 'score-X' : `score-${e.score}`;
     const scoreDisp = e.score === 'X' ? 'X/6' : `${e.score}/6`;
+    const deleteBtn = isAdmin
+      ? `<button class="delete-btn" onclick="deleteEntry(${e.id})" title="Delete">✕</button>`
+      : '';
     return `<div class="history-item">
       <div class="history-meta">
         <span class="history-player">${e.player}</span>
@@ -734,14 +765,15 @@ function renderHistory() {
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span class="history-score ${scoreClass}">${scoreDisp}</span>
-        <button class="delete-btn" onclick="deleteEntry(${e.id})" title="Delete">✕</button>
+        ${deleteBtn}
       </div>
     </div>`;
   }).join('');
 }
 
 function deleteEntry(id) {
-  supabase.from('scores').delete().eq('id', id).then(() => {
+  supabase.from('scores').delete().eq('id', id).then(({ error }) => {
+    if (error) { showToast('Delete failed — are you logged in?'); return; }
     fetchScores();
     showToast('Entry removed');
   });
@@ -787,13 +819,13 @@ function renderAll() {
   renderHistory();
 }
 
-// Render immediately so the page isn't blank while fetch loads
 setHeaderDate();
 renderAll();
-
-// Then fetch real data from Supabase
+checkSession();
 fetchScores();
 subscribeToScores();
+checkHash();
+
 window.addEventListener('focus', fetchScores);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) fetchScores();
