@@ -497,7 +497,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL = "https://shwvzovanprmfesgaerr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_braVFdZ2cgC6WNSOszJbIg_g-TL_e5o";
@@ -769,11 +769,11 @@ function changeMonth(dir) {
 }
 
 // --- Tabs ---
-function switchTab(name) {
+function switchTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  btn.classList.add('active');
   if (name === 'history') renderHistory();
 }
 
