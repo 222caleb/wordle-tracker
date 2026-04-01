@@ -442,7 +442,7 @@
     <div class="prize-banner">
       <div class="prize-left">
         <div class="prize-title">Grand Prize</div>
-        <div class="prize-amount" id="prize-amount">$80</div>
+        <div class="prize-amount" id="prize-amount">$100</div>
         <div class="prize-sub">Lowest avg score wins each month · most points by Dec wins all</div>
       </div>
       <div class="points-grid" id="points-grid"></div>
@@ -467,7 +467,7 @@
           <label>Your Name</label>
           <select id="submit-player">
             <option value="">Select...</option>
-            <option>J</option><option>T</option><option>N</option><option>D</option><option>C</option>
+            <option>Jeff</option><option>Tristan</option><option>Nana</option><option>Daniel</option><option>Caleb</option>
           </select>
         </div>
       </div>
@@ -484,11 +484,11 @@
   <div id="tab-history" class="tab-content">
     <div class="history-filters" id="history-filters">
       <button class="filter-btn active" onclick="filterHistory('ALL', this)">ALL</button>
-      <button class="filter-btn" onclick="filterHistory('J', this)">J</button>
-      <button class="filter-btn" onclick="filterHistory('T', this)">T</button>
-      <button class="filter-btn" onclick="filterHistory('N', this)">N</button>
-      <button class="filter-btn" onclick="filterHistory('D', this)">D</button>
-      <button class="filter-btn" onclick="filterHistory('C', this)">C</button>
+      <button class="filter-btn" onclick="filterHistory('Jeff', this)">J</button>
+      <button class="filter-btn" onclick="filterHistory('Tristan', this)">T</button>
+      <button class="filter-btn" onclick="filterHistory('Nana', this)">N</button>
+      <button class="filter-btn" onclick="filterHistory('Daniel', this)">D</button>
+      <button class="filter-btn" onclick="filterHistory('Caleb', this)">C</button>
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
@@ -497,8 +497,17 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const PLAYERS = ['J','T','N','D','C'];
+const SUPABASE_URL = "https://shwvzovanprmfesgaerr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_braVFdZ2cgC6WNSOszJbIg_g-TL_e5o";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allScores = [];
+let scoresChannel = null;
+
+const PLAYERS = ['Jeff','Tristan','Nana','Daniel','Caleb'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FULL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -507,19 +516,47 @@ let historyFilter = 'ALL';
 
 // --- Storage ---
 function loadData() {
-  try { return JSON.parse(localStorage.getItem('wt_scores') || '[]'); } catch(e) { return []; }
+  return allScores;
 }
-function saveData(d) { localStorage.setItem('wt_scores', JSON.stringify(d)); }
+
+async function fetchScores() {
+  const { data, error } = await supabase
+    .from('scores')
+    .select('*')
+    .order('id', { ascending: false });
+
+  if (!error) {
+    allScores = data || [];
+    renderAll();
+  }
+}
+
+function subscribeToScores() {
+  if (scoresChannel) return;
+
+  scoresChannel = supabase
+    .channel('scores-changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'scores' },
+      () => {
+        fetchScores();
+      }
+    )
+    .subscribe();
+}
 
 // --- Parse Wordle paste ---
 function parseWordle(text) {
-  const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
-  if (!lines.length) return null;
-  const header = lines[0];
-  const m = header.match(/Wordle\s+([\d,]+)\s+(\d+|X)\/6/i);
-  if (!m) return null;
-  const puzzleNum = m[1].replace(',','');
-  const score = m[2] === 'X' ? 'X' : parseInt(m[2]);
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+
+  const headerMatch = trimmed.match(/Wordle\s+([\d,]+)\s+(\d+|X)\/6/i);
+  if (!headerMatch) return null;
+
+  const puzzleNum = headerMatch[1].replace(/,/g, '');
+  const score = headerMatch[2] === 'X' ? 'X' : parseInt(headerMatch[2], 10);
+
   return { puzzleNum, score };
 }
 
@@ -564,13 +601,13 @@ function submitScore() {
     year: new Date().getFullYear()
   };
 
-  data.push(entry);
-  saveData(data);
+  supabase.from('scores').insert([entry]).then(() => {
+    fetchScores();
+  });
   document.getElementById('submit-text').value = '';
   document.getElementById('submit-player').value = '';
   document.getElementById('parse-preview').textContent = '';
   showToast(`Score submitted! ${player}: ${parsed.score}/6`);
-  renderAll();
 }
 
 // --- Render leaderboard ---
@@ -665,8 +702,7 @@ function getMonthPoints(player) {
 
 function renderPrizeSection() {
   const pts = computeMonthlyPoints();
-  const prizePerPlayer = 20;
-  const totalPrize = (PLAYERS.length - 1) * prizePerPlayer;
+  const totalPrize = 100;
   document.getElementById('prize-amount').textContent = `$${totalPrize}`;
 
   const maxPts = Math.max(...Object.values(pts));
@@ -712,10 +748,10 @@ function renderHistory() {
 }
 
 function deleteEntry(id) {
-  const data = loadData().filter(e => e.id !== id);
-  saveData(data);
-  renderAll();
-  showToast('Entry removed');
+  supabase.from('scores').delete().eq('id', id).then(() => {
+    fetchScores();
+    showToast('Entry removed');
+  });
 }
 
 function filterHistory(player, btn) {
@@ -764,7 +800,12 @@ function renderAll() {
 }
 
 setHeaderDate();
-renderAll();
+fetchScores();
+subscribeToScores();
+window.addEventListener('focus', fetchScores);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) fetchScores();
+});
 </script>
 </body>
 </html>
