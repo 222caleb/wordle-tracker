@@ -54,10 +54,7 @@
     gap: 10px;
   }
 
-  .logo-tiles {
-    display: flex;
-    gap: 3px;
-  }
+  .logo-tiles { display: flex; gap: 3px; }
 
   .logo-tile {
     width: 14px;
@@ -75,6 +72,7 @@
     color: var(--text2);
     text-align: right;
     line-height: 1.5;
+    white-space: pre;
   }
 
   .main { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 0; }
@@ -157,6 +155,10 @@
     transition: border-color 0.15s;
   }
 
+  .player-row.no-season-pts {
+    grid-template-columns: 28px 1fr 80px 80px;
+  }
+
   .player-row:hover { border-color: var(--text3); }
   .player-row.leader { border-color: var(--green); }
 
@@ -179,9 +181,7 @@
 
   .crown { font-size: 14px; }
 
-  .stat-col {
-    text-align: right;
-  }
+  .stat-col { text-align: right; }
 
   .stat-val {
     font-family: var(--mono);
@@ -380,7 +380,6 @@
     gap: 12px;
   }
 
-  .prize-left { }
   .prize-title { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
   .prize-amount { font-size: 24px; font-weight: 700; }
   .prize-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
@@ -407,6 +406,7 @@
   /* Responsive */
   @media (max-width: 500px) {
     .player-row { grid-template-columns: 24px 1fr 60px 60px 60px; gap: 4px; }
+    .player-row.no-season-pts { grid-template-columns: 24px 1fr 60px 60px; }
     .stat-val { font-size: 13px; }
     .score-bar-wrap { display: none; }
   }
@@ -431,9 +431,9 @@
 <div class="main">
 
   <div class="tabs">
-<button class="tab active" onclick="switchTab('leaderboard', this)">LEADERBOARD</button>
+    <button class="tab active" onclick="switchTab('leaderboard', this)">LEADERBOARD</button>
     <button class="tab" onclick="switchTab('submit', this)">SUBMIT SCORE</button>
-    <button class="tab" onclick="switchTab('history', this)">HISTORY</button>    
+    <button class="tab" onclick="switchTab('history', this)">HISTORY</button>
   </div>
 
   <!-- LEADERBOARD -->
@@ -514,7 +514,6 @@ const FULL_MONTHS = ['January','February','March','April','May','June','July','A
 let currentMonth = new Date().getMonth();
 let historyFilter = 'ALL';
 
-// --- Storage ---
 function loadData() {
   return allScores;
 }
@@ -533,16 +532,11 @@ async function fetchScores() {
 
 function subscribeToScores() {
   if (scoresChannel) return;
-
   scoresChannel = supabase
     .channel('scores-changes')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'scores' },
-      () => {
-        fetchScores();
-      }
-    )
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'scores' }, () => {
+      fetchScores();
+    })
     .subscribe();
 }
 
@@ -550,13 +544,10 @@ function subscribeToScores() {
 function parseWordle(text) {
   const trimmed = text.trim();
   if (!trimmed) return null;
-
   const headerMatch = trimmed.match(/Wordle\s+([\d,]+)\s+(\d+|X)\/6/i);
   if (!headerMatch) return null;
-
   const puzzleNum = headerMatch[1].replace(/,/g, '');
   const score = headerMatch[2] === 'X' ? 'X' : parseInt(headerMatch[2], 10);
-
   return { puzzleNum, score };
 }
 
@@ -585,7 +576,6 @@ function submitScore() {
   if (!parsed) { showToast('Could not parse Wordle result'); return; }
 
   const data = loadData();
-  // Prevent duplicate puzzle+player
   if (data.find(e => e.player === player && e.puzzleNum === parsed.puzzleNum)) {
     showToast(`${player} already submitted Wordle #${parsed.puzzleNum}`);
     return;
@@ -601,79 +591,14 @@ function submitScore() {
     year: new Date().getFullYear()
   };
 
-  supabase.from('scores').insert([entry]).then(() => {
-    fetchScores();
-  });
+  supabase.from('scores').insert([entry]).then(() => fetchScores());
   document.getElementById('submit-text').value = '';
   document.getElementById('submit-player').value = '';
   document.getElementById('parse-preview').textContent = '';
   showToast(`Score submitted! ${player}: ${parsed.score}/6`);
 }
 
-// --- Render leaderboard ---
-function renderLeaderboard() {
-  const data = loadData();
-  const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
-
-  document.getElementById('month-label').textContent = FULL_MONTHS[currentMonth].toUpperCase();
-
-  // Per-player stats for current month
-  const stats = PLAYERS.map(p => {
-    const entries = monthData.filter(e => e.player === p);
-    const scores = entries.map(e => e.score === 'X' ? 7 : e.score);
-    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-    return { player: p, count: entries.length, avg, scores };
-  });
-
-  // Sort: by avg (lower better), then count (more games = tiebreak)
-  stats.sort((a,b) => {
-    if (a.avg === null && b.avg === null) return 0;
-    if (a.avg === null) return 1;
-    if (b.avg === null) return -1;
-    if (Math.abs(a.avg - b.avg) > 0.001) return a.avg - b.avg;
-    return b.count - a.count;
-  });
-
-  const maxCount = Math.max(...stats.map(s => s.count), 1);
-
-  const lb = document.getElementById('leaderboard');
-  lb.innerHTML = '';
-
-  stats.forEach((s, i) => {
-    const isLeader = i === 0 && s.avg !== null;
-    const row = document.createElement('div');
-    row.className = 'player-row' + (isLeader ? ' leader' : '');
-
-    const rankLabel = i === 0 && s.avg !== null ? '<span class="rank gold">1</span>' : `<span class="rank">${i+1}</span>`;
-    const crown = isLeader ? '<span class="crown">👑</span>' : '';
-    const avgDisplay = s.avg !== null ? s.avg.toFixed(2) : '—';
-    const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
-    const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
-
-    row.innerHTML = `
-      ${rankLabel}
-      <div class="player-name">${crown}${s.player}</div>
-      <div class="stat-col">
-        <div class="${avgClass}">${avgDisplay}</div>
-        <div class="stat-label">avg</div>
-      </div>
-      <div class="stat-col">
-        <div class="stat-val">${s.count}</div>
-        <div class="stat-label">games</div>
-      </div>
-      <div class="stat-col">
-        <div class="stat-val">${getMonthPoints(s.player)}</div>
-        <div class="stat-label">total pts</div>
-      </div>
-      <div class="score-bar-wrap">
-        <div class="score-bar"><div class="score-bar-fill" style="width:${barWidth}%"></div></div>
-      </div>
-    `;
-    lb.appendChild(row);
-  });
-}
-
-// --- Monthly points: award 1 pt per past month winner ---
+// --- Monthly points ---
 function computeMonthlyPoints() {
   const data = loadData();
   const now = new Date();
@@ -700,11 +625,79 @@ function getMonthPoints(player) {
   return computeMonthlyPoints()[player] || 0;
 }
 
+// Returns true if at least one past month has been played
+function hasSeasonPoints() {
+  return new Date().getMonth() > 0 && Object.values(computeMonthlyPoints()).some(v => v > 0);
+}
+
+// --- Render leaderboard ---
+function renderLeaderboard() {
+  const data = loadData();
+  const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
+
+  document.getElementById('month-label').textContent = FULL_MONTHS[currentMonth].toUpperCase();
+
+  const showSeasonPts = hasSeasonPoints();
+
+  const stats = PLAYERS.map(p => {
+    const entries = monthData.filter(e => e.player === p);
+    const scores = entries.map(e => e.score === 'X' ? 7 : e.score);
+    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+    return { player: p, count: entries.length, avg };
+  });
+
+  stats.sort((a,b) => {
+    if (a.avg === null && b.avg === null) return 0;
+    if (a.avg === null) return 1;
+    if (b.avg === null) return -1;
+    if (Math.abs(a.avg - b.avg) > 0.001) return a.avg - b.avg;
+    return b.count - a.count;
+  });
+
+  const maxCount = Math.max(...stats.map(s => s.count), 1);
+  const lb = document.getElementById('leaderboard');
+  lb.innerHTML = '';
+
+  stats.forEach((s, i) => {
+    const isLeader = i === 0 && s.avg !== null;
+    const row = document.createElement('div');
+    row.className = 'player-row' + (isLeader ? ' leader' : '') + (!showSeasonPts ? ' no-season-pts' : '');
+
+    const rankLabel = isLeader ? '<span class="rank gold">1</span>' : `<span class="rank">${i+1}</span>`;
+    const crown = isLeader ? '<span class="crown">👑</span>' : '';
+    const avgDisplay = s.avg !== null ? s.avg.toFixed(2) : '—';
+    const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
+    const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
+
+    const seasonPtsCol = showSeasonPts ? `
+      <div class="stat-col">
+        <div class="stat-val">${getMonthPoints(s.player)}</div>
+        <div class="stat-label">season pts</div>
+      </div>` : '';
+
+    row.innerHTML = `
+      ${rankLabel}
+      <div class="player-name">${crown}${s.player}</div>
+      <div class="stat-col">
+        <div class="${avgClass}">${avgDisplay}</div>
+        <div class="stat-label">avg</div>
+      </div>
+      <div class="stat-col">
+        <div class="stat-val">${s.count}</div>
+        <div class="stat-label">games</div>
+      </div>
+      ${seasonPtsCol}
+      <div class="score-bar-wrap">
+        <div class="score-bar"><div class="score-bar-fill" style="width:${barWidth}%"></div></div>
+      </div>
+    `;
+    lb.appendChild(row);
+  });
+}
+
+// --- Prize section: always show all players ---
 function renderPrizeSection() {
   const pts = computeMonthlyPoints();
-  const totalPrize = 100;
-  document.getElementById('prize-amount').textContent = `$${totalPrize}`;
-
   const maxPts = Math.max(...Object.values(pts));
   const grid = document.getElementById('points-grid');
   grid.innerHTML = PLAYERS.map(p => {
@@ -761,14 +754,11 @@ function filterHistory(player, btn) {
   renderHistory();
 }
 
-// --- Month nav ---
 function changeMonth(dir) {
-  const now = new Date();
   currentMonth = Math.max(0, Math.min(11, currentMonth + dir));
   renderLeaderboard();
 }
 
-// --- Tabs ---
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -777,7 +767,6 @@ function switchTab(name, btn) {
   if (name === 'history') renderHistory();
 }
 
-// --- Toast ---
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -785,7 +774,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// --- Header date ---
 function setHeaderDate() {
   const now = new Date();
   const opts = { weekday: 'short', month: 'short', day: 'numeric' };
@@ -799,7 +787,11 @@ function renderAll() {
   renderHistory();
 }
 
+// Render immediately so the page isn't blank while fetch loads
 setHeaderDate();
+renderAll();
+
+// Then fetch real data from Supabase
 fetchScores();
 subscribeToScores();
 window.addEventListener('focus', fetchScores);
