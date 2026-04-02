@@ -642,7 +642,7 @@ function computeMonthlyPoints() {
     if (!monthData.length) continue;
     const stats = PLAYERS.map(p => {
       const entries = monthData.filter(e => e.player === p);
-      const scores = entries.map(e => e.score === 'X' ? 7 : e.score);
+      const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
       const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
       return { player: p, avg, count: entries.length };
     }).filter(s => s.avg !== null);
