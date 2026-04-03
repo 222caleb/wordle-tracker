@@ -858,7 +858,7 @@ function renderLeaderboard() {
     const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
     const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
     const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
-    return { player: p, count: entries.length, avg, total, best };
+    return { player: p, count: entries.length, avg, total };;
   });
 
   stats.sort((a,b) => {
