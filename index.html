@@ -161,29 +161,35 @@
     border-radius: 8px;
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: 28px 1fr 80px 80px 80px;
+    grid-template-columns: 28px 1fr 70px 70px 70px 70px;
     align-items: center;
     gap: 8px;
     transition: border-color 0.15s;
   }
-  .player-row.no-season-pts { grid-template-columns: 28px 1fr 80px 80px; }
+  .player-row.no-season-pts { grid-template-columns: 28px 1fr 70px 70px 70px; }
   .player-row:hover { border-color: var(--text3); }
   .player-row.leader { border-color: var(--green); }
+  .player-row.silver { border-color: #aaa; }
+  .player-row.bronze { border-color: #cd7f32; }
 
   .rank { font-family: var(--mono); font-size: 12px; color: var(--text3); text-align: center; }
   .rank.gold { color: #f5c518; }
+  .rank.silver { color: #aaaaaa; }
+  .rank.bronze { color: #cd7f32; }
 
   .player-name { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-  .crown { font-size: 14px; }
+  .medal { font-size: 14px; }
   .stat-col { text-align: right; }
   .stat-val { font-family: var(--mono); font-size: 15px; color: var(--text); }
   .stat-val.good { color: var(--green); }
+  .stat-val.best { color: var(--yellow); }
   .stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
 
   .score-bar-wrap { margin-top: 6px; grid-column: 2 / -1; }
   .score-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .score-bar-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
+  /* Submit */
   .submit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
   .submit-title { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); margin-bottom: 1.25rem; }
   .form-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -239,6 +245,90 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* Today's scores */
+  .today-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .today-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .today-wordle-num {
+    color: var(--text3);
+    font-size: 11px;
+  }
+
+  .today-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .today-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    gap: 10px;
+  }
+
+  .today-left { display: flex; align-items: center; gap: 10px; }
+  .today-player { font-weight: 600; font-size: 14px; }
+
+  .today-reaction {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .reaction-kablooie { color: var(--green); animation: pop 0.4s ease; }
+  .reaction-boom { font-size: 18px; }
+  .reaction-rip { color: #e74c3c; }
+
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .today-score-display {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .today-gif {
+    width: 100%;
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .today-gif-wrap { grid-column: 1 / -1; }
+
+  .today-empty {
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 0.5rem 0;
+  }
+
+  /* History */
   .history-filters { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 
   .filter-btn {
@@ -292,6 +382,7 @@
   }
   .delete-btn:hover { color: #e74c3c; background: rgba(231,76,60,0.1); }
 
+  /* Prize */
   .prize-banner {
     background: linear-gradient(135deg, #1a2e1a 0%, #1a1a1b 100%);
     border: 1px solid var(--green);
@@ -315,7 +406,7 @@
   .points-chip .p-pts { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
   .points-chip .p-pts.leading { color: var(--green); }
 
-  /* Admin login modal */
+  /* Modal */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -353,13 +444,12 @@
     transition: border-color 0.1s, color 0.1s;
   }
   .cancel-btn:hover { border-color: var(--text2); color: var(--text); }
-
   .login-error { font-family: var(--mono); font-size: 12px; color: #e74c3c; margin-top: 8px; min-height: 18px; }
 
-  @media (max-width: 500px) {
-    .player-row { grid-template-columns: 24px 1fr 60px 60px 60px; gap: 4px; }
-    .player-row.no-season-pts { grid-template-columns: 24px 1fr 60px 60px; }
-    .stat-val { font-size: 13px; }
+  @media (max-width: 540px) {
+    .player-row { grid-template-columns: 24px 1fr 55px 55px 55px 55px; gap: 4px; }
+    .player-row.no-season-pts { grid-template-columns: 24px 1fr 55px 55px 55px; }
+    .stat-val { font-size: 12px; }
     .score-bar-wrap { display: none; }
   }
 </style>
@@ -384,7 +474,6 @@
   </div>
 </header>
 
-<!-- Admin login modal -->
 <div class="modal-overlay" id="admin-modal">
   <div class="modal">
     <div class="modal-title">Admin Login</div>
@@ -431,6 +520,17 @@
 
   <!-- SUBMIT -->
   <div id="tab-submit" class="tab-content">
+
+    <div class="today-card">
+      <div class="today-title">
+        <span>TODAY'S SCORES</span>
+        <span class="today-wordle-num" id="today-wordle-num"></span>
+      </div>
+      <div class="today-list" id="today-list">
+        <div class="today-empty">No scores yet today.</div>
+      </div>
+    </div>
+
     <div class="submit-card">
       <div class="submit-title">Post Your Score</div>
       <div class="form-row">
@@ -482,6 +582,31 @@ const PLAYERS = ['Jeff','Tristan','Nana','Daniel','Caleb'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FULL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+// Hardcoded cliff/fail gifs — swap these out for whatever your family finds funniest
+const FAIL_GIFS = [
+  'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif',
+  'https://media.giphy.com/media/3o7aTskHEUdgCQAXde/giphy.gif',
+  'https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif',
+  'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif',
+];
+
+function getFailGif() {
+  return FAIL_GIFS[Math.floor(Math.random() * FAIL_GIFS.length)];
+}
+
+function getReaction(score) {
+  if (score === 1 || score === 2) {
+    return { text: 'KABLOOIE!!', cls: 'reaction-kablooie' };
+  }
+  if (score === 3) {
+    return { text: '💥', cls: 'reaction-boom' };
+  }
+  if (score === 'X' || score === 6 || score === '6') {
+    return { gif: getFailGif(), cls: 'reaction-rip' };
+  }
+  return null;
+}
+
 let currentMonth = new Date().getMonth();
 let historyFilter = 'ALL';
 
@@ -503,13 +628,8 @@ async function adminLogin() {
   const password = document.getElementById('admin-password').value;
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
-
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    errEl.textContent = 'Invalid email or password.';
-    return;
-  }
-
+  if (error) { errEl.textContent = 'Invalid email or password.'; return; }
   closeAdminModal();
   setAdminState(true);
   showToast('Logged in as admin');
@@ -541,7 +661,6 @@ document.getElementById('admin-password').addEventListener('keydown', function(e
   if (e.key === 'Enter') adminLogin();
 });
 
-// trigger
 function checkHash() {
   if (window.location.hash === '#admin') {
     if (!isAdmin) openAdminModal();
@@ -630,6 +749,73 @@ function submitScore() {
   showToast(`Score submitted! ${player}: ${parsed.score}/6`);
 }
 
+// --- Today's scores ---
+function getTodaysPuzzleNum() {
+  const data = loadData();
+  const today = new Date();
+  const todayScores = data.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === today.getFullYear() &&
+           d.getMonth() === today.getMonth() &&
+           d.getDate() === today.getDate();
+  });
+  if (todayScores.length) return todayScores[0].puzzleNum;
+  return null;
+}
+
+function renderTodayScores() {
+  const data = loadData();
+  const today = new Date();
+  const todayScores = data.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === today.getFullYear() &&
+           d.getMonth() === today.getMonth() &&
+           d.getDate() === today.getDate();
+  }).sort((a, b) => {
+    const sa = a.score === 'X' ? 7 : parseInt(a.score, 10);
+    const sb = b.score === 'X' ? 7 : parseInt(b.score, 10);
+    return sa - sb;
+  });
+
+  const puzzleNum = getTodaysPuzzleNum();
+  const numEl = document.getElementById('today-wordle-num');
+  numEl.textContent = puzzleNum ? `#${puzzleNum}` : '';
+
+  const list = document.getElementById('today-list');
+
+  if (!todayScores.length) {
+    list.innerHTML = '<div class="today-empty">No scores yet today.</div>';
+    return;
+  }
+
+  list.innerHTML = todayScores.map(e => {
+    const scoreNum = e.score === 'X' ? 'X' : parseInt(e.score, 10);
+    const scoreClass = e.score === 'X' ? 'score-X' : `score-${e.score}`;
+    const scoreDisp = e.score === 'X' ? 'X/6' : `${e.score}/6`;
+    const reaction = getReaction(scoreNum);
+
+    let reactionHTML = '';
+    if (reaction) {
+      if (reaction.gif) {
+        reactionHTML = `<img src="${reaction.gif}" class="today-gif" alt="reaction" />`;
+      } else {
+        reactionHTML = `<span class="today-reaction ${reaction.cls}">${reaction.text}</span>`;
+      }
+    }
+
+    return `<div style="display:flex;flex-direction:column;gap:0">
+      <div class="today-item">
+        <div class="today-left">
+          <span class="today-player">${e.player}</span>
+          ${reactionHTML && !reaction.gif ? reactionHTML : ''}
+        </div>
+        <span class="today-score-display ${scoreClass}">${scoreDisp}</span>
+      </div>
+      ${reaction && reaction.gif ? `<img src="${reaction.gif}" class="today-gif" alt="oof" />` : ''}
+    </div>`;
+  }).join('');
+}
+
 // --- Monthly points ---
 function computeMonthlyPoints() {
   const data = loadData();
@@ -671,7 +857,9 @@ function renderLeaderboard() {
     const entries = monthData.filter(e => e.player === p);
     const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
     const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-    return { player: p, count: entries.length, avg };
+    const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
+    const best = scores.length ? Math.min(...scores) : null;
+    return { player: p, count: entries.length, avg, total, best };
   });
 
   stats.sort((a,b) => {
@@ -688,13 +876,27 @@ function renderLeaderboard() {
 
   stats.forEach((s, i) => {
     const isLeader = i === 0 && s.avg !== null;
-    const row = document.createElement('div');
-    row.className = 'player-row' + (isLeader ? ' leader' : '') + (!showSeasonPts ? ' no-season-pts' : '');
+    const isSilver = i === 1 && s.avg !== null;
+    const isBronze = i === 2 && s.avg !== null;
 
-    const rankLabel = isLeader ? '<span class="rank gold">1</span>' : `<span class="rank">${i+1}</span>`;
-    const crown = isLeader ? '<span class="crown">👑</span>' : '';
+    const row = document.createElement('div');
+    let rowClass = 'player-row';
+    if (isLeader) rowClass += ' leader';
+    else if (isSilver) rowClass += ' silver';
+    else if (isBronze) rowClass += ' bronze';
+    if (!showSeasonPts) rowClass += ' no-season-pts';
+    row.className = rowClass;
+
+    let rankLabel, medal;
+    if (isLeader)      { rankLabel = '<span class="rank gold">1</span>';   medal = '<span class="medal">👑</span>'; }
+    else if (isSilver) { rankLabel = '<span class="rank silver">2</span>'; medal = '<span class="medal">🥈</span>'; }
+    else if (isBronze) { rankLabel = '<span class="rank bronze">3</span>'; medal = '<span class="medal">🥉</span>'; }
+    else               { rankLabel = `<span class="rank">${i+1}</span>`;   medal = ''; }
+
     const avgDisplay = s.avg !== null ? s.avg.toFixed(2) : '—';
     const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
+    const totalDisplay = s.total !== null ? s.total : '—';
+    const bestDisplay = s.best !== null ? (s.best === 7 ? 'X' : s.best) : '—';
     const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
 
     const seasonPtsCol = showSeasonPts ? `
@@ -705,14 +907,18 @@ function renderLeaderboard() {
 
     row.innerHTML = `
       ${rankLabel}
-      <div class="player-name">${crown}${s.player}</div>
+      <div class="player-name">${medal}${s.player}</div>
       <div class="stat-col">
         <div class="${avgClass}">${avgDisplay}</div>
         <div class="stat-label">avg</div>
       </div>
       <div class="stat-col">
-        <div class="stat-val">${s.count}</div>
-        <div class="stat-label">games</div>
+        <div class="stat-val">${totalDisplay}</div>
+        <div class="stat-label">total</div>
+      </div>
+      <div class="stat-col">
+        <div class="stat-val best">${bestDisplay}</div>
+        <div class="stat-label">best</div>
       </div>
       ${seasonPtsCol}
       <div class="score-bar-wrap">
@@ -797,6 +1003,7 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
   if (name === 'history') renderHistory();
+  if (name === 'submit') renderTodayScores();
 }
 
 function showToast(msg) {
@@ -817,6 +1024,7 @@ function renderAll() {
   renderLeaderboard();
   renderPrizeSection();
   renderHistory();
+  renderTodayScores();
 }
 
 setHeaderDate();
