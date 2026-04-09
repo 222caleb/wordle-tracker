@@ -2,13 +2,13 @@
 function submitScore() {
   const player = document.getElementById('submit-player').value;
   const text = document.getElementById('submit-text').value;
-  if (!player) { showToast('Please select your name'); return; }
+  if (!player) { showToast('Please select your name', true); return; }
   const parsed = parseWordle(text);
-  if (!parsed) { showToast('Could not parse Wordle result'); return; }
+  if (!parsed) { showToast('Could not parse Wordle result', true); return; }
 
   const data = loadData();
   if (data.find(e => e.player === player && e.puzzleNum === parsed.puzzleNum)) {
-    showToast(`${player} already submitted Wordle #${parsed.puzzleNum}`);
+    showToast(`${player} already submitted Wordle #${parsed.puzzleNum}`, true);
     return;
   }
 
@@ -23,6 +23,7 @@ function submitScore() {
   };
 
   supabase.from('scores').insert([entry]).then(() => fetchScores());
+  showScoreReveal(player, parsed.score);
   document.getElementById('submit-text').value = '';
   document.getElementById('submit-player').value = '';
   document.getElementById('parse-preview').textContent = '';
@@ -68,7 +69,13 @@ function renderTodayScores() {
     return;
   }
 
-  list.innerHTML = todayScores.map(e => {
+  const playedToday = new Set(todayScores.map(e => e.player));
+  const waiting = PLAYERS.filter(p => !playedToday.has(p));
+  const waitingHTML = waiting.length
+    ? `<div class="waiting-on">Still waiting on: ${waiting.join(', ')}</div>`
+    : '';
+
+  list.innerHTML = todayScores.map((e, i) => {
     const scoreNum = e.score === 'X' ? 'X' : parseInt(e.score, 10);
     const scoreClass = e.score === 'X' ? 'score-X' : `score-${e.score}`;
     const scoreDisp = e.score === 'X' ? 'X/6' : `${e.score}/6`;
@@ -83,7 +90,7 @@ function renderTodayScores() {
       }
     }
 
-    return `<div style="display:flex;flex-direction:column;gap:0">
+    return `<div class="today-flip-wrap" style="animation-delay:${i * 110}ms">
       <div class="today-item">
         <div class="today-left">
           <span class="today-player">${e.player}</span>
@@ -92,6 +99,6 @@ function renderTodayScores() {
         <span class="today-score-display ${scoreClass}">${scoreDisp}</span>
       </div>
       ${reaction && reaction.gif ? `<img src="${reaction.gif}" class="today-gif" alt="oof" />` : ''}
-    </div>`;
-  }).join('');
+    </div>`; // closes today-flip-wrap
+  }).join('') + waitingHTML;
 }

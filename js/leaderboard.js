@@ -1,11 +1,12 @@
 // --- Monthly points ---
-function computeMonthlyPoints() {
+function computeMonthlyPoints(upToMonth) {
   const data = loadData();
   const now = new Date();
+  const limit = upToMonth !== undefined ? upToMonth : now.getMonth();
   const pts = {};
   PLAYERS.forEach(p => pts[p] = 0);
 
-  for (let m = 0; m < now.getMonth(); m++) {
+  for (let m = 0; m < limit; m++) {
     const monthData = data.filter(e => e.month === m && e.year === now.getFullYear());
     if (!monthData.length) continue;
     const stats = PLAYERS.map(p => {
@@ -21,26 +22,105 @@ function computeMonthlyPoints() {
   return pts;
 }
 
-function getMonthPoints(player) { return computeMonthlyPoints()[player] || 0; }
+function getMonthPoints(player, upToMonth) { return computeMonthlyPoints(upToMonth)[player] || 0; }
 
-function hasSeasonPoints() {
-  return new Date().getMonth() > 0 && Object.values(computeMonthlyPoints()).some(v => v > 0);
+function hasSeasonPoints(upToMonth) {
+  const limit = upToMonth !== undefined ? upToMonth : new Date().getMonth();
+  return limit > 0 && Object.values(computeMonthlyPoints(upToMonth)).some(v => v > 0);
+}
+
+// --- Sparkline ---
+function buildSparkline(playerScores) {
+  const recent = [...playerScores].sort((a, b) => a.id - b.id).slice(-10);
+  if (recent.length < 2) return '';
+
+  const vals = recent.map(s => s.score === 'X' ? 7 : parseInt(s.score, 10));
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const range = max - min || 1;
+  const W = 56, H = 20;
+
+  const pts = vals.map((v, i) => {
+    const x = (i / (vals.length - 1)) * W;
+    // lower score = lower y = higher on chart (better performance = line goes up)
+    const y = ((v - min) / range) * (H - 6) + 3;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+
+  // negative trend = recent scores lower = improving = green
+  const trend = vals[vals.length - 1] - vals[0];
+  const color = trend < 0 ? '#538d4e' : trend > 0 ? '#e67e22' : '#565758';
+  const lastX = W;
+  const lastY = ((vals[vals.length - 1] - min) / range) * (H - 6) + 3;
+
+  return `<svg class="sparkline" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastX}" cy="${lastY.toFixed(1)}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+
+// --- Count-up ---
+function startCountUps(container) {
+  const duration = 700;
+  container.querySelectorAll('[data-count-up]').forEach(el => {
+    const target = parseFloat(el.dataset.countUp);
+    if (isNaN(target) || target === 0) return;
+    const decimals = parseInt(el.dataset.decimals || '0');
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = decimals ? (target * eased).toFixed(decimals) : Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
 }
 
 // --- Leaderboard ---
+function toggleDist(card) {
+  const isExpanding = !card.classList.contains('expanded');
+  card.classList.toggle('expanded');
+  if (isExpanding) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        card.querySelectorAll('.dist-bar-inner[data-width]').forEach(el => {
+          el.style.width = el.dataset.width + '%';
+        });
+      });
+    });
+  } else {
+    card.querySelectorAll('.dist-bar-inner').forEach(el => {
+      el.style.width = '0%';
+    });
+  }
+}
+
 function renderLeaderboard() {
   const data = loadData();
   const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
-  document.getElementById('month-label').textContent = FULL_MONTHS[currentMonth].toUpperCase();
 
-  const showSeasonPts = hasSeasonPoints();
+  const monthLabelEl = document.getElementById('month-label');
+  monthLabelEl.textContent = FULL_MONTHS[currentMonth].toUpperCase();
+  monthLabelEl.classList.toggle('current-month', currentMonth === new Date().getMonth());
+
+  const showSeasonPts = hasSeasonPoints(currentMonth);
 
   const stats = PLAYERS.map(p => {
     const entries = monthData.filter(e => e.player === p);
+    const allEntries = data.filter(e => e.player === p);
     const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
     const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
     const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
-    return { player: p, count: entries.length, avg, total };;
+
+    const dist = {};
+    ['1','2','3','4','5','6','X'].forEach(v => dist[v] = 0);
+    entries.forEach(e => {
+      const key = e.score === 'X' ? 'X' : String(e.score);
+      dist[key] = (dist[key] || 0) + 1;
+    });
+
+    return { player: p, count: entries.length, avg, total, dist, allEntries };
   });
 
   stats.sort((a,b) => {
@@ -60,13 +140,11 @@ function renderLeaderboard() {
     const isSilver = i === 1 && s.avg !== null;
     const isBronze = i === 2 && s.avg !== null;
 
-    const row = document.createElement('div');
     let rowClass = 'player-row';
     if (isLeader) rowClass += ' leader';
     else if (isSilver) rowClass += ' silver';
     else if (isBronze) rowClass += ' bronze';
     if (!showSeasonPts) rowClass += ' no-season-pts';
-    row.className = rowClass;
 
     let rankLabel, medal;
     if (isLeader)      { rankLabel = '<span class="rank gold">1</span>';   medal = '<span class="medal">👑</span>'; }
@@ -74,44 +152,88 @@ function renderLeaderboard() {
     else if (isBronze) { rankLabel = '<span class="rank bronze">3</span>'; medal = '<span class="medal">🥉</span>'; }
     else               { rankLabel = `<span class="rank">${i+1}</span>`;   medal = ''; }
 
-    const avgDisplay = s.avg !== null ? s.avg.toFixed(2) : '—';
     const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
-    const totalDisplay = s.total !== null ? s.total : '—';
     const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
+    const avatarColor = PLAYER_COLORS[s.player] || '#555';
+    const sparklineHTML = buildSparkline(s.allEntries);
+    const seasonPts = getMonthPoints(s.player, currentMonth);
 
     const seasonPtsCol = showSeasonPts ? `
       <div class="stat-col">
-        <div class="stat-val">${getMonthPoints(s.player)}</div>
+        <div class="stat-val" data-count-up="${seasonPts}">0</div>
         <div class="stat-label">season pts</div>
       </div>` : '';
 
-    row.innerHTML = `
-      ${rankLabel}
-      <div class="player-name">${medal}${s.player}</div>
-      <div class="stat-col">
-        <div class="${avgClass}">${avgDisplay}</div>
-        <div class="stat-label">avg</div>
+    const maxDistCount = Math.max(...Object.values(s.dist), 1);
+    const distBars = ['1','2','3','4','5','6','X'].map(v => {
+      const count = s.dist[v] || 0;
+      const w = Math.round((count / maxDistCount) * 100);
+      const labelClass = v === 'X' ? 'score-X' : `score-${v}`;
+      return `<div class="dist-bar-row">
+        <span class="dist-score-label ${labelClass}">${v}</span>
+        <div class="dist-bar-bg">
+          <div class="dist-bar-inner" data-score="${v}" data-width="${w}" style="width:0%"></div>
+        </div>
+        <span class="dist-count">${count}</span>
+      </div>`;
+    }).join('');
+
+    const card = document.createElement('div');
+    card.className = 'player-card';
+    card.style.animationDelay = `${i * 65}ms`;
+    card.addEventListener('click', () => toggleDist(card));
+
+    card.innerHTML = `
+      <div class="${rowClass}">
+        ${rankLabel}
+        <div class="player-name">
+          ${medal}
+          <div class="player-avatar" style="background:${avatarColor}">${s.player[0]}</div>
+          ${s.player}
+          <div class="name-right">
+            ${sparklineHTML}
+            <span class="expand-icon">▾</span>
+          </div>
+        </div>
+        <div class="stat-col">
+          <div class="${avgClass}" ${s.avg !== null ? `data-count-up="${s.avg.toFixed(2)}" data-decimals="2"` : ''}>${s.avg !== null ? '0.00' : '—'}</div>
+          <div class="stat-label">avg</div>
+        </div>
+        <div class="stat-col">
+          <div class="stat-val" ${s.total !== null ? `data-count-up="${s.total}"` : ''}>${s.total !== null ? '0' : '—'}</div>
+          <div class="stat-label">total</div>
+        </div>
+        <div class="stat-col">
+          <div class="stat-val" data-count-up="${s.count}">0</div>
+          <div class="stat-label">games</div>
+        </div>
+        ${seasonPtsCol}
+        <div class="score-bar-wrap">
+          <div class="score-bar"><div class="score-bar-fill" data-width="${barWidth}" style="width:0%"></div></div>
+        </div>
       </div>
-      <div class="stat-col">
-        <div class="stat-val">${totalDisplay}</div>
-        <div class="stat-label">total</div>
-      </div>
-      <div class="stat-col">
-        <div class="stat-val">${s.count}</div>
-        <div class="stat-label">games</div>
-      </div>
-      ${seasonPtsCol}
-      <div class="score-bar-wrap">
-        <div class="score-bar"><div class="score-bar-fill" style="width:${barWidth}%"></div></div>
+      <div class="dist-panel">
+        <div class="dist-title">Score Distribution — ${FULL_MONTHS[currentMonth]}</div>
+        ${distBars}
       </div>
     `;
-    lb.appendChild(row);
+
+    lb.appendChild(card);
+  });
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      lb.querySelectorAll('.score-bar-fill[data-width]').forEach(el => {
+        el.style.width = el.dataset.width + '%';
+      });
+      startCountUps(lb);
+    });
   });
 }
 
 // --- Prize section ---
 function renderPrizeSection() {
-  const pts = computeMonthlyPoints();
+  const pts = computeMonthlyPoints(currentMonth);
   const maxPts = Math.max(...Object.values(pts));
   const grid = document.getElementById('points-grid');
   grid.innerHTML = PLAYERS.map(p => {
@@ -126,4 +248,5 @@ function renderPrizeSection() {
 function changeMonth(dir) {
   currentMonth = Math.max(0, Math.min(11, currentMonth + dir));
   renderLeaderboard();
+  renderPrizeSection();
 }

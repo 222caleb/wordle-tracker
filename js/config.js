@@ -10,6 +10,14 @@ let currentMonth = new Date().getMonth();
 let historyFilter = 'ALL';
 
 const PLAYERS = ['Jeff','Tristan','Nana','Daniel','Caleb'];
+
+const PLAYER_COLORS = {
+  Jeff:    '#e67e22',
+  Tristan: '#9b59b6',
+  Nana:    '#e74c3c',
+  Daniel:  '#3498db',
+  Caleb:   '#1abc9c',
+};
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FULL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
