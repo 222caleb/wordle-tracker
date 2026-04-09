@@ -96,7 +96,7 @@ function toggleDist(card) {
   }
 }
 
-function renderLeaderboard() {
+function renderLeaderboard(shouldAnimate = false) {
   const data = loadData();
   const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
 
@@ -180,7 +180,10 @@ function renderLeaderboard() {
 
     const card = document.createElement('div');
     card.className = 'player-card';
-    card.style.animationDelay = `${i * 65}ms`;
+    if (shouldAnimate) {
+      card.style.animation = `rowSlideIn 0.4s ease both`;
+      card.style.animationDelay = `${i * 65}ms`;
+    }
     card.addEventListener('click', () => toggleDist(card));
 
     card.innerHTML = `
@@ -247,6 +250,6 @@ function renderPrizeSection() {
 
 function changeMonth(dir) {
   currentMonth = Math.max(0, Math.min(11, currentMonth + dir));
-  renderLeaderboard();
+  renderLeaderboard(true);
   renderPrizeSection();
 }

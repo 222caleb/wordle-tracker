@@ -4,7 +4,7 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
   updateTabIndicator(btn);
-  if (name === 'leaderboard') renderLeaderboard();
+  if (name === 'leaderboard') renderLeaderboard(true);
   if (name === 'history') renderHistory();
   if (name === 'submit') renderTodayScores();
 }

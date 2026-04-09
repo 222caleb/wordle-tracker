@@ -823,7 +823,6 @@ textarea {
 .player-card {
   display: flex;
   flex-direction: column;
-  animation: rowSlideIn 0.4s ease both;
 }
 
 .player-card .player-row {
@@ -1018,13 +1017,14 @@ a.history-wordle:hover {
 
 /* ── Today scores tile flip ── */
 .today-flip-wrap {
+  display: flex;
+  flex-direction: column;
   animation: tileFlipIn 0.38s ease both;
-  transform-origin: top center;
 }
 
 @keyframes tileFlipIn {
-  from { transform: rotateX(-80deg); opacity: 0; }
-  to   { transform: rotateX(0deg);   opacity: 1; }
+  from { transform: translateY(-10px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
 
 /* ── Score reveal overlay ── */
@@ -1113,13 +1113,32 @@ a.history-wordle:hover {
 
 @media (max-width: 540px) {
   .player-row {
-    grid-template-columns: 24px 1fr 55px 55px 55px 55px;
-    gap: 4px;
+    grid-template-columns: 22px 1fr 50px 50px 50px 50px;
+    gap: 3px;
+    padding: 10px 12px;
   }
 
   .player-row.no-season-pts {
-    grid-template-columns: 24px 1fr 55px 55px 55px;
+    grid-template-columns: 22px 1fr 50px 50px 50px;
   }
+
   .stat-val { font-size: 12px; }
   .score-bar-wrap { display: none; }
+
+  /* Hide sparkline — not enough room on mobile */
+  .sparkline { display: none; }
+
+  /* Hide medal emoji — saves critical space in the name column */
+  .medal { display: none; }
+
+  /* Tighten name column flex layout */
+  .player-name { gap: 4px; }
+
+  /* Smaller avatar on mobile */
+  .player-avatar { width: 20px; height: 20px; font-size: 9px; }
+
+  /* Reset #1 size boosts — too cramped on mobile */
+  .player-row.leader .player-avatar { width: 20px; height: 20px; font-size: 9px; }
+  .player-row.leader .player-name   { font-size: 14px; }
+  .player-row.leader .stat-val      { font-size: 12px; }
 }
