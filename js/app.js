@@ -96,3 +96,66 @@ window.addEventListener('focus', fetchScores);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) fetchScores();
 });
+
+// --- Hero terminal typing animation ---
+(function() {
+  const lines = [
+    'loading april standings...',
+    'fetching today\'s scores...',
+    'who played today? → caleb, jeff',
+    'still waiting on: tristan, nana, daniel',
+    'caleb avg: 4.20 — needs improvement',
+    'leaderboard updated.',
+    'calculating monthly winner...',
+    'warning: jeff is on a hot streak',
+    'next wordle in: ' + (function() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = Math.round((tomorrow - now) / 60000);
+      const h = Math.floor(diff / 60), m = diff % 60;
+      return h + 'h ' + m + 'm';
+    })(),
+    'good luck today. you\'ll need it.',
+  ];
+
+  let lineIdx = 0, charIdx = 0, deleting = false, pauseTicks = 0;
+  const el = document.getElementById('terminalText');
+  if (!el) return;
+
+  function tick() {
+    const line = lines[lineIdx];
+
+    if (pauseTicks > 0) {
+      pauseTicks--;
+      setTimeout(tick, 60);
+      return;
+    }
+
+    if (!deleting) {
+      charIdx++;
+      el.textContent = line.slice(0, charIdx);
+      if (charIdx === line.length) {
+        deleting = true;
+        pauseTicks = 28; // hold at full line
+        setTimeout(tick, 60);
+      } else {
+        setTimeout(tick, 42 + Math.random() * 30);
+      }
+    } else {
+      charIdx--;
+      el.textContent = line.slice(0, charIdx);
+      if (charIdx === 0) {
+        deleting = false;
+        lineIdx = (lineIdx + 1) % lines.length;
+        pauseTicks = 6;
+        setTimeout(tick, 60);
+      } else {
+        setTimeout(tick, 22);
+      }
+    }
+  }
+
+  setTimeout(tick, 800);
+})();

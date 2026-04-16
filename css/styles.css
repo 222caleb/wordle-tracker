@@ -1142,3 +1142,112 @@ a.history-wordle:hover {
   .player-row.leader .player-name   { font-size: 14px; }
   .player-row.leader .stat-val      { font-size: 12px; }
 }
+
+/* ── Hero Terminal ── */
+.hero-section {
+  padding: 2.5rem 1.5rem 1.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-name {
+  font-family: var(--mono);
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.hero-name span {
+  color: #f5c518;
+}
+
+/* Glitch effect */
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--mono);
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+}
+
+.glitch::before {
+  color: #e74c3c;
+  clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+  animation: glitch-top 3.5s infinite steps(1);
+}
+
+.glitch::after {
+  color: #3498db;
+  clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  animation: glitch-bot 3.5s infinite steps(1);
+}
+
+@keyframes glitch-top {
+  0%, 88%, 100% { transform: translateX(0); opacity: 0; }
+  90%           { transform: translateX(-3px); opacity: 1; }
+  92%           { transform: translateX(3px); opacity: 1; }
+  94%           { transform: translateX(0); opacity: 0; }
+}
+
+@keyframes glitch-bot {
+  0%, 88%, 100% { transform: translateX(0); opacity: 0; }
+  91%           { transform: translateX(3px); opacity: 1; }
+  93%           { transform: translateX(-3px); opacity: 1; }
+  95%           { transform: translateX(0); opacity: 0; }
+}
+
+.hero-title {
+  font-family: var(--mono);
+  font-size: clamp(0.6rem, 2vw, 0.75rem);
+  color: var(--text2);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.25rem;
+}
+
+.hero-terminal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 1rem;
+  font-family: var(--mono);
+  font-size: clamp(0.7rem, 2.2vw, 0.85rem);
+  color: var(--green);
+  min-width: 260px;
+  max-width: 100%;
+  text-align: left;
+}
+
+.terminal-prompt {
+  color: var(--text3);
+  flex-shrink: 0;
+}
+
+#terminalText {
+  word-break: break-all;
+}
+
+.cursor {
+  display: inline-block;
+  color: var(--green);
+  animation: cursorBlink 0.9s step-end infinite;
+  margin-left: 1px;
+  line-height: 1;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
