@@ -1251,3 +1251,180 @@ a.history-wordle:hover {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
+
+/* ── Monthly Celebration Overlay ── */
+.celebration-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.92);
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+.celebration-overlay.active {
+  display: flex;
+}
+
+.cel-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cel-piece {
+  position: absolute;
+  top: -10px;
+  animation: celFall linear infinite;
+}
+
+@keyframes celFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+}
+
+.cel-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 90%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  animation: celContentIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes celContentIn {
+  from { transform: scale(0.7) translateY(40px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.cel-month {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+
+.cel-trophy {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  animation: trophyBounce 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+}
+
+@keyframes trophyBounce {
+  from { transform: scale(0) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.cel-winner {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.cel-sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+
+.cel-stats {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-bottom: 0.5rem;
+}
+
+.cel-prize {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f5c518;
+  letter-spacing: 0.15em;
+  margin-bottom: 1.5rem;
+}
+
+.cel-congrats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.cel-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+  animation: celCardPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes celCardPop {
+  from { transform: scale(0.5) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.cel-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+
+.cel-pname {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+.cel-msg {
+  font-size: 0.65rem;
+  color: var(--text2);
+  text-align: center;
+  font-style: italic;
+  max-width: 110px;
+}
+
+.cel-close-btn {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.75rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cel-close-btn:hover { opacity: 0.85; }

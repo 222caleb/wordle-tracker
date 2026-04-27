@@ -12,11 +12,12 @@ function computeMonthlyPoints(upToMonth) {
     const stats = PLAYERS.map(p => {
       const entries = monthData.filter(e => e.player === p);
       const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
+      const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
       const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-      return { player: p, avg, count: entries.length };
-    }).filter(s => s.avg !== null);
+      return { player: p, total, avg, count: entries.length };
+    }).filter(s => s.total !== null);
     if (!stats.length) continue;
-    stats.sort((a,b) => a.avg !== b.avg ? a.avg - b.avg : b.count - a.count);
+    stats.sort((a,b) => a.total !== b.total ? a.total - b.total : a.avg - b.avg);
     pts[stats[0].player]++;
   }
   return pts;
@@ -124,11 +125,11 @@ function renderLeaderboard(shouldAnimate = false) {
   });
 
   stats.sort((a,b) => {
-    if (a.avg === null && b.avg === null) return 0;
-    if (a.avg === null) return 1;
-    if (b.avg === null) return -1;
-    if (Math.abs(a.avg - b.avg) > 0.001) return a.avg - b.avg;
-    return b.count - a.count;
+    if (a.total === null && b.total === null) return 0;
+    if (a.total === null) return 1;
+    if (b.total === null) return -1;
+    if (a.total !== b.total) return a.total - b.total;
+    return a.avg - b.avg;
   });
 
   const maxCount = Math.max(...stats.map(s => s.count), 1);

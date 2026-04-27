@@ -60,11 +60,13 @@ function setHeaderDate() {
     now.toLocaleDateString('en-US', opts).toUpperCase() + '\n' + FULL_MONTHS[now.getMonth()].toUpperCase() + ' STANDINGS';
 }
 
+let _celebrationChecked = false;
 function renderAll() {
   renderLeaderboard();
   renderPrizeSection();
   renderHistory();
   renderTodayScores();
+  if (!_celebrationChecked) { _celebrationChecked = true; checkCelebration(); }
 }
 
 setHeaderDate();
@@ -97,49 +99,79 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) fetchScores();
 });
 
-// --- Hero terminal typing animation ---
-(function() {
-  const lines = [
-    'loading april standings...',
-    'fetching today\'s scores...',
-    'who played today? → caleb, jeff',
-    'still waiting on: tristan, nana, daniel',
-    'caleb avg: 4.20 — needs improvement',
-    'leaderboard updated.',
-    'calculating monthly winner...',
-    'warning: jeff is on a hot streak',
-    'next wordle in: ' + (function() {
-      const now = new Date();
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(0, 0, 0, 0);
-      const diff = Math.round((tomorrow - now) / 60000);
-      const h = Math.floor(diff / 60), m = diff % 60;
-      return h + 'h ' + m + 'm';
-    })(),
-    'good luck today. you\'ll need it.',
-  ];
+// --- Hero terminal ---
+function buildTerminalLines() {
+  const data = loadData();
+  const today = new Date();
+  const month = today.getMonth(), year = today.getFullYear();
 
-  let lineIdx = 0, charIdx = 0, deleting = false, pauseTicks = 0;
+  const todayEntries = data.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === today.getDate();
+  });
+  const playedToday = todayEntries.map(e => e.player);
+  const waiting = PLAYERS.filter(p => !playedToday.includes(p));
+
+  const monthData = data.filter(e => e.month === month && e.year === year);
+  const monthStats = PLAYERS.map(p => {
+    const entries = monthData.filter(e => e.player === p);
+    const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
+    const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
+    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+    return { player: p, total, avg, count: entries.length };
+  }).filter(s => s.total !== null).sort((a,b) => a.total !== b.total ? a.total - b.total : a.avg - b.avg);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const diff = Math.round((tomorrow - today) / 60000);
+  const h = Math.floor(diff / 60), m = diff % 60;
+
+  const lines = [`loading ${FULL_MONTHS[month].toLowerCase()} standings...`];
+
+  if (playedToday.length > 0) {
+    lines.push(`played today → ${playedToday.map(p => p.toLowerCase()).join(', ')}`);
+  } else {
+    lines.push('no scores yet today — go play!');
+  }
+
+  if (waiting.length > 0 && playedToday.length > 0) {
+    lines.push(`still waiting on: ${waiting.map(p => p.toLowerCase()).join(', ')}`);
+  } else if (playedToday.length === PLAYERS.length) {
+    lines.push('everyone played today!');
+  }
+
+  if (monthStats.length > 0) {
+    const leader = monthStats[0];
+    lines.push(`${leader.player.toLowerCase()} leads · ${leader.total} pts · ${leader.avg.toFixed(2)} avg`);
+  }
+
+  if (monthStats.length > 1) {
+    const last = monthStats[monthStats.length - 1];
+    lines.push(`${last.player.toLowerCase()} in last — ${last.total} pts`);
+  }
+
+  lines.push(`next wordle in: ${h}h ${m}m`);
+  lines.push("good luck today. you'll need it.");
+  return lines;
+}
+
+(function startTerminal() {
   const el = document.getElementById('terminalText');
   if (!el) return;
+  let lines = [], lineIdx = 0, charIdx = 0, deleting = false, pauseTicks = 0;
 
   function tick() {
-    const line = lines[lineIdx];
+    if (lineIdx === 0 && charIdx === 0 && !deleting) lines = buildTerminalLines();
+    const line = lines[lineIdx] || '';
 
-    if (pauseTicks > 0) {
-      pauseTicks--;
-      setTimeout(tick, 60);
-      return;
-    }
+    if (pauseTicks > 0) { pauseTicks--; setTimeout(tick, 60); return; }
 
     if (!deleting) {
       charIdx++;
       el.textContent = line.slice(0, charIdx);
       if (charIdx === line.length) {
-        deleting = true;
-        pauseTicks = 28; // hold at full line
-        setTimeout(tick, 60);
+        deleting = true; pauseTicks = 28; setTimeout(tick, 60);
       } else {
         setTimeout(tick, 42 + Math.random() * 30);
       }
@@ -147,15 +179,91 @@ document.addEventListener('visibilitychange', () => {
       charIdx--;
       el.textContent = line.slice(0, charIdx);
       if (charIdx === 0) {
-        deleting = false;
-        lineIdx = (lineIdx + 1) % lines.length;
-        pauseTicks = 6;
-        setTimeout(tick, 60);
+        deleting = false; lineIdx = (lineIdx + 1) % lines.length; pauseTicks = 6; setTimeout(tick, 60);
       } else {
         setTimeout(tick, 22);
       }
     }
   }
 
-  setTimeout(tick, 800);
+  setTimeout(tick, 1500);
 })();
+
+// --- Monthly celebration ---
+function checkCelebration() {
+  const today = new Date();
+  if (today.getDate() !== 1) return;
+  const key = `wordleCelebrated_${today.getFullYear()}_${today.getMonth()}`;
+  if (localStorage.getItem(key)) return;
+
+  const prevMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+  const prevYear = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+  const data = loadData();
+  const monthData = data.filter(e => e.month === prevMonth && e.year === prevYear);
+  if (!monthData.length) return;
+
+  const stats = PLAYERS.map(p => {
+    const entries = monthData.filter(e => e.player === p);
+    const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
+    const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
+    const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2) : null;
+    return { player: p, total, avg, count: entries.length };
+  }).filter(s => s.total !== null).sort((a,b) => a.total !== b.total ? a.total - b.total : a.avg - b.avg);
+
+  if (!stats.length) return;
+  localStorage.setItem(key, '1');
+  showCelebration(stats[0], stats.slice(1), FULL_MONTHS[prevMonth]);
+}
+
+function showCelebration(winner, others, monthName) {
+  const msgs = [
+    "fair and square! 👏",
+    "buy me dinner 🍕",
+    "rematch next month! 💪",
+    "respect. 🫡",
+    "don't spend it all at once 😅",
+    "i'll get you next time 😤",
+    "teach me your ways 🙏",
+  ];
+
+  const overlay = document.getElementById('celebration-overlay');
+  const winnerColor = PLAYER_COLORS[winner.player] || '#f5c518';
+
+  document.getElementById('cel-month').textContent = monthName.toUpperCase() + ' WINNER';
+  const nameEl = document.getElementById('cel-winner');
+  nameEl.textContent = winner.player.toUpperCase();
+  nameEl.style.color = winnerColor;
+  nameEl.style.textShadow = `0 0 40px ${winnerColor}88`;
+  document.getElementById('cel-stats').textContent =
+    `${winner.total} total pts · ${winner.avg} avg · ${winner.count} games`;
+
+  // confetti
+  const confettiEl = document.getElementById('cel-confetti');
+  const colors = ['#f5c518','#538d4e','#b59f3b','#e67e22','#9b59b6','#3498db','#e74c3c'];
+  confettiEl.innerHTML = Array.from({length: 55}, (_, i) => {
+    const c = colors[i % colors.length];
+    const left = Math.random() * 100;
+    const size = 5 + Math.random() * 7;
+    const delay = Math.random() * 3;
+    const dur = 2.5 + Math.random() * 2;
+    const round = Math.random() > 0.5 ? '50%' : '2px';
+    return `<div class="cel-piece" style="left:${left}%;width:${size}px;height:${size}px;background:${c};border-radius:${round};animation-delay:${delay}s;animation-duration:${dur}s"></div>`;
+  }).join('');
+
+  // congrats cards
+  document.getElementById('cel-congrats').innerHTML = others.map((p, i) => {
+    const color = PLAYER_COLORS[p.player] || '#555';
+    const msg = msgs[i % msgs.length];
+    return `<div class="cel-card" style="animation-delay:${700 + i * 180}ms">
+      <div class="cel-avatar" style="background:${color}">${p.player[0]}</div>
+      <div class="cel-pname">${p.player}</div>
+      <div class="cel-msg">"${msg}"</div>
+    </div>`;
+  }).join('');
+
+  overlay.classList.add('active');
+}
+
+function closeCelebration() {
+  document.getElementById('celebration-overlay').classList.remove('active');
+}
