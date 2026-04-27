@@ -20,10 +20,9 @@ function renderHistory() {
     const deleteBtn = isAdmin
       ? `<button class="delete-btn" onclick="deleteEntry(${e.id})" data-delete-id="${e.id}" title="Delete">✕</button>`
       : '';
-    const avatarColor = PLAYER_COLORS[e.player] || '#555';
     return `<div class="history-item">
       <div class="history-meta">
-        <div class="player-avatar player-avatar-sm" style="background:${avatarColor}">${e.player[0]}</div>
+        ${avatarImgHTML(e.player, 'player-avatar player-avatar-sm')}
         <span class="history-player">${e.player}</span>
         <a class="history-wordle" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">#${e.puzzleNum}</a>
         <span class="history-date">${dateStr}</span>

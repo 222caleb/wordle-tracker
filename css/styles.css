@@ -1,5 +1,6 @@
 :root {
   --green: #538d4e;
+  --accent: #8878f0;
   --yellow: #b59f3b;
   --gray: #3a3a3c;
   --bg: #121213;
@@ -44,6 +45,7 @@ header {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
+  color: var(--accent);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -87,8 +89,8 @@ header {
 .admin-badge {
   font-family: var(--mono);
   font-size: 10px;
-  color: var(--green);
-  border: 1px solid var(--green);
+  color: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 4px;
   padding: 3px 8px;
   letter-spacing: 0.06em;
@@ -150,7 +152,7 @@ header {
 }
 
 .tab.active {
-  color: var(--green);
+  color: var(--accent);
   border-bottom-color: transparent;
 }
 
@@ -391,7 +393,7 @@ textarea {
 }
 
 .submit-btn {
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -940,7 +942,7 @@ a.history-wordle:hover {
   position: absolute;
   bottom: -1px;
   height: 2px;
-  background: var(--green);
+  background: var(--accent);
   border-radius: 1px;
   transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1193,7 +1195,7 @@ a.history-wordle:hover {
 }
 
 .hero-name span {
-  color: #f5c518;
+  color: var(--accent);
 }
 
 /* Glitch effect */
@@ -1255,7 +1257,7 @@ a.history-wordle:hover {
   padding: 0.55rem 1rem;
   font-family: var(--mono);
   font-size: clamp(0.7rem, 2.2vw, 0.85rem);
-  color: var(--green);
+  color: var(--accent);
   min-width: 260px;
   max-width: 100%;
   text-align: left;
@@ -1272,7 +1274,7 @@ a.history-wordle:hover {
 
 .cursor {
   display: inline-block;
-  color: var(--green);
+  color: var(--accent);
   animation: cursorBlink 0.9s step-end infinite;
   margin-left: 1px;
   line-height: 1;
@@ -1443,7 +1445,7 @@ a.history-wordle:hover {
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -1493,7 +1495,7 @@ a.history-wordle:hover {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -1829,44 +1831,82 @@ a.history-wordle:hover {
   margin-bottom: 0.5rem;
 }
 
-.avatar-style-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 1rem;
+.builder-attr-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 0.75rem;
 }
 
-.style-chip {
+.builder-attr-tab {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 4px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  transition: border-color 0.15s;
-}
-
-.style-chip:hover { border-color: var(--text2); }
-.style-chip.selected { border-color: var(--green); }
-
-.style-chip-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--surface);
-}
-
-.style-chip-label {
-  font-family: var(--mono);
-  font-size: 0.5rem;
   color: var(--text2);
-  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-.style-chip.selected .style-chip-label { color: var(--green); }
+.builder-attr-tab:hover { color: var(--text); border-color: var(--text2); }
+.builder-attr-tab.active { border-color: var(--accent); color: var(--accent); }
+
+.builder-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 56px;
+  margin-bottom: 1rem;
+  padding: 4px 0;
+}
+
+.color-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.selected { border-color: #fff; }
+
+.swatch-check {
+  font-size: 0.7rem;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+.style-option {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.1s;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.style-option:hover { transform: scale(1.08); border-color: var(--text2); }
+.style-option.selected { border-color: var(--accent); }
+
+.style-option-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .avatar-seed-row {
   display: flex;
@@ -1887,7 +1927,7 @@ a.history-wordle:hover {
   outline: none;
 }
 
-.avatar-seed-input:focus { border-color: var(--green); }
+.avatar-seed-input:focus { border-color: var(--accent); }
 
 .avatar-random-btn {
   font-family: var(--mono);

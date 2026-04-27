@@ -1,30 +1,57 @@
-// --- Avatar helpers ---
-const AVATAR_STYLES = [
-  { id: 'pixel-art',  label: 'Pixel'      },
-  { id: 'adventurer', label: 'Adventurer' },
-  { id: 'lofi',       label: 'Lofi'       },
-  { id: 'bottts',     label: 'Robot'      },
-  { id: 'fun-emoji',  label: 'Emoji'      },
-  { id: 'thumbs',     label: 'Thumbs'     },
-  { id: 'croodles',   label: 'Doodle'     },
-  { id: 'micah',      label: 'Micah'      },
-];
+// --- Character builder config ---
+const CHAR_BUILDER = {
+  skinColor: {
+    label: 'Skin',
+    type: 'color',
+    opts: ['ffdbb4','edb98a','ecad80','d78774','ae5d29','b16914','614335'],
+  },
+  hair: {
+    label: 'Hair',
+    type: 'style',
+    opts: ['long01','long02','long03','long04','long05','short01','short02','short03','short04','short05','bangs','buns','mohawk','curly01','curly02'],
+  },
+  hairColor: {
+    label: 'Hair Color',
+    type: 'color',
+    opts: ['0e0e0e','6a4e35','3eac2c','f5c518','e74c3c','e67e22','9b59b6','3498db','c0c0c0'],
+  },
+  eyes: {
+    label: 'Eyes',
+    type: 'style',
+    opts: ['variant01','variant02','variant03','variant04','variant05','variant06','variant07','variant08'],
+  },
+  mouth: {
+    label: 'Mouth',
+    type: 'style',
+    opts: ['variant01','variant02','variant03','variant04','variant05','variant06','variant07'],
+  },
+  backgroundColor: {
+    label: 'Background',
+    type: 'color',
+    opts: ['transparent','b6e3f4','c0aede','d1d4f9','ffd5dc','ffdfbf','1a1a1b','121213'],
+  },
+};
 
+// --- Avatar helpers ---
 function getPlayerAvatar(player) {
   try {
     const s = localStorage.getItem(`wordleAvatar_${player}`);
     if (s) return JSON.parse(s);
   } catch(e) {}
-  return { style: 'pixel-art', seed: player.toLowerCase() };
+  return { style: 'adventurer', seed: player.toLowerCase(), attrs: {} };
 }
 
 function getAvatarUrl(player) {
-  const { style, seed } = getPlayerAvatar(player);
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
+  const config = getPlayerAvatar(player);
+  const params = new URLSearchParams({ seed: config.seed });
+  if (config.attrs) {
+    Object.entries(config.attrs).forEach(([k, v]) => {
+      if (v && v !== 'transparent') params.append(k, v);
+    });
+  }
+  return `https://api.dicebear.com/9.x/${config.style || 'adventurer'}/svg?${params}`;
 }
 
-// Returns an avatar div that works for any size class (player-avatar, cel-avatar, etc.)
-// The div has a background-color fallback and overlays the DiceBear SVG image.
 function avatarImgHTML(player, className = 'player-avatar', clickable = false) {
   const url = getAvatarUrl(player);
   const color = PLAYER_COLORS[player] || '#555';
@@ -45,10 +72,12 @@ function openProfile(player, event) {
   _profilePlayer = player;
   renderProfileContent(player);
   document.getElementById('profile-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeProfile() {
   document.getElementById('profile-overlay').classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 function renderProfileContent(player) {
@@ -132,56 +161,97 @@ function renderProfileContent(player) {
   }).join('');
 }
 
-// --- Avatar picker ---
-let _pickerPlayer = null;
-let _pickerStyle  = 'pixel-art';
+// --- Character builder (avatar picker) ---
+let _pickerPlayer  = null;
+let _activeAttr    = 'skinColor';
+let _builderState  = { seed: '', attrs: {} };
+
+function _buildUrl(attrs, seed) {
+  const params = new URLSearchParams({ seed: seed || _builderState.seed });
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (v && v !== 'transparent') params.append(k, v);
+  });
+  return `https://api.dicebear.com/9.x/adventurer/svg?${params}`;
+}
 
 function openAvatarPicker() {
   _pickerPlayer = _profilePlayer;
-  const av = getPlayerAvatar(_pickerPlayer);
-  _pickerStyle = av.style;
-  document.getElementById('avatar-seed-input').value = av.seed;
-  renderStyleGrid();
-  updateAvatarPreview();
+  const saved = getPlayerAvatar(_pickerPlayer);
+  _builderState = { seed: saved.seed || _pickerPlayer.toLowerCase(), attrs: { ...(saved.attrs || {}) } };
+  _activeAttr = 'skinColor';
+  document.getElementById('avatar-seed-input').value = _builderState.seed;
+  _renderBuilder();
   document.getElementById('avatar-picker-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeAvatarPicker() {
   document.getElementById('avatar-picker-overlay').classList.remove('active');
+  // keep body lock — profile is still open
 }
 
-function renderStyleGrid() {
-  const seed = document.getElementById('avatar-seed-input').value || (_pickerPlayer || 'player').toLowerCase();
-  document.getElementById('avatar-style-grid').innerHTML = AVATAR_STYLES.map(s => `
-    <div class="style-chip ${s.id === _pickerStyle ? 'selected' : ''}" onclick="selectAvatarStyle('${s.id}')">
-      <img src="https://api.dicebear.com/9.x/${s.id}/svg?seed=${encodeURIComponent(seed)}" class="style-chip-img" alt="">
-      <span class="style-chip-label">${s.label}</span>
-    </div>
-  `).join('');
+function _renderBuilder() {
+  document.getElementById('avatar-preview-img').src = _buildUrl(_builderState.attrs);
+
+  // attribute tabs
+  document.getElementById('builder-attr-tabs').innerHTML = Object.entries(CHAR_BUILDER).map(([key, def]) =>
+    `<button class="builder-attr-tab ${key === _activeAttr ? 'active' : ''}" onclick="selectBuilderAttr('${key}')">${def.label}</button>`
+  ).join('');
+
+  // options panel
+  const def = CHAR_BUILDER[_activeAttr];
+  const current = _builderState.attrs[_activeAttr] || '';
+
+  if (def.type === 'color') {
+    document.getElementById('builder-options').innerHTML = def.opts.map(v => {
+      const hex = v === 'transparent' ? 'transparent' : '#' + v;
+      const border = v === 'transparent' ? '2px dashed var(--text3)' : '';
+      const selected = current === v;
+      return `<div class="color-swatch ${selected ? 'selected' : ''}" style="background:${hex};${border}"
+        onclick="selectBuilderOption('${v}')">${selected ? '<span class="swatch-check">✓</span>' : ''}</div>`;
+    }).join('');
+  } else {
+    document.getElementById('builder-options').innerHTML = def.opts.map(v => {
+      const previewAttrs = { ..._builderState.attrs, [_activeAttr]: v };
+      const url = _buildUrl(previewAttrs);
+      const selected = current === v;
+      return `<div class="style-option ${selected ? 'selected' : ''}" onclick="selectBuilderOption('${v}')">
+        <img src="${url}" class="style-option-img" alt="" loading="lazy">
+      </div>`;
+    }).join('');
+  }
 }
 
-function selectAvatarStyle(styleId) {
-  _pickerStyle = styleId;
-  renderStyleGrid();
-  updateAvatarPreview();
+function selectBuilderAttr(key) {
+  _activeAttr = key;
+  _renderBuilder();
 }
 
-function updateAvatarPreview() {
-  const seed = document.getElementById('avatar-seed-input').value || (_pickerPlayer || 'player').toLowerCase();
-  document.getElementById('avatar-preview-img').src =
-    `https://api.dicebear.com/9.x/${_pickerStyle}/svg?seed=${encodeURIComponent(seed)}`;
+function selectBuilderOption(value) {
+  _builderState.attrs[_activeAttr] = value;
+  _renderBuilder();
 }
 
 function randomizeSeed() {
-  document.getElementById('avatar-seed-input').value = Math.random().toString(36).slice(2, 10);
-  renderStyleGrid();
-  updateAvatarPreview();
+  const seed = Math.random().toString(36).slice(2, 10);
+  _builderState.seed = seed;
+  document.getElementById('avatar-seed-input').value = seed;
+  _renderBuilder();
+}
+
+function updateAvatarPreview() {
+  _builderState.seed = document.getElementById('avatar-seed-input').value || _pickerPlayer.toLowerCase();
+  _renderBuilder();
 }
 
 function saveAvatar() {
   if (!_pickerPlayer) return;
-  const seed = document.getElementById('avatar-seed-input').value || _pickerPlayer.toLowerCase();
-  localStorage.setItem(`wordleAvatar_${_pickerPlayer}`, JSON.stringify({ style: _pickerStyle, seed }));
+  _builderState.seed = document.getElementById('avatar-seed-input').value || _pickerPlayer.toLowerCase();
+  localStorage.setItem(`wordleAvatar_${_pickerPlayer}`, JSON.stringify({
+    style: 'adventurer',
+    seed: _builderState.seed,
+    attrs: _builderState.attrs,
+  }));
   closeAvatarPicker();
   renderProfileContent(_pickerPlayer);
   document.getElementById('profile-avatar-img').src = getAvatarUrl(_pickerPlayer);

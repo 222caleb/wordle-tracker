@@ -298,6 +298,7 @@ async function showCelebration(winner, others, monthName, prevMonth, prevYear) {
     .subscribe();
 
   overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
 async function sendCongrats(fromPlayer, toPlayer, month, year) {
@@ -328,5 +329,6 @@ async function sendCongrats(fromPlayer, toPlayer, month, year) {
 
 function closeCelebration() {
   document.getElementById('celebration-overlay').classList.remove('active');
+  document.body.style.overflow = '';
   if (_congratsChannel) { supabase.removeChannel(_congratsChannel); _congratsChannel = null; }
 }
