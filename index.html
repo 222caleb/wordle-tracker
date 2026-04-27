@@ -62,6 +62,7 @@
     <button class="tab active" onclick="switchTab('leaderboard', this)">LEADERBOARD</button>
     <button class="tab" onclick="switchTab('submit', this)">SUBMIT SCORE</button>
     <button class="tab" onclick="switchTab('history', this)">HISTORY</button>
+    <button class="tab" onclick="switchTab('halloffame', this)">HALL OF FAME</button>
     <div class="tab-indicator"></div>
   </div>
 
@@ -128,9 +129,59 @@
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
+
+  <!-- HALL OF FAME -->
+  <div id="tab-halloffame" class="tab-content">
+    <div class="hof-header">
+      <div class="hof-title">HALL OF FAME</div>
+      <div class="hof-subtitle">Monthly champions</div>
+    </div>
+    <div id="hof-list" class="hof-list"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Profile overlay -->
+<div id="profile-overlay" class="profile-overlay" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-modal">
+    <button class="profile-close-btn" onclick="closeProfile()">✕</button>
+    <div class="profile-header">
+      <div class="profile-avatar-area">
+        <img id="profile-avatar-img" class="profile-avatar-img" src="" alt="">
+        <button id="profile-avatar-edit-btn" class="profile-avatar-edit-btn" onclick="openAvatarPicker()">EDIT AVATAR</button>
+      </div>
+      <div class="profile-header-info">
+        <div class="profile-name" id="profile-name"></div>
+        <div class="profile-rank" id="profile-rank"></div>
+      </div>
+    </div>
+    <div class="profile-stats-grid" id="profile-stats-grid"></div>
+    <div class="profile-section-label">SCORE DISTRIBUTION</div>
+    <div id="profile-dist" class="profile-dist"></div>
+    <div class="profile-section-label">MONTHLY AVG TREND</div>
+    <div id="profile-monthly" class="profile-monthly"></div>
+  </div>
+</div>
+
+<!-- Avatar picker overlay -->
+<div id="avatar-picker-overlay" class="avatar-picker-overlay" onclick="if(event.target===this)closeAvatarPicker()">
+  <div class="avatar-picker-modal">
+    <div class="avatar-picker-title">CUSTOMIZE AVATAR</div>
+    <img id="avatar-preview-img" class="avatar-preview-img" src="" alt="">
+    <div class="avatar-picker-section-label">STYLE</div>
+    <div id="avatar-style-grid" class="avatar-style-grid"></div>
+    <div class="avatar-picker-section-label">SEED</div>
+    <div class="avatar-seed-row">
+      <input id="avatar-seed-input" class="avatar-seed-input" type="text" placeholder="type anything..." oninput="updateAvatarPreview()">
+      <button class="avatar-random-btn" onclick="randomizeSeed()">RANDOM</button>
+    </div>
+    <div class="avatar-picker-actions">
+      <button class="submit-btn" onclick="saveAvatar()">SAVE AVATAR</button>
+      <button class="cancel-btn" onclick="closeAvatarPicker()">CANCEL</button>
+    </div>
+  </div>
+</div>
 
 <div id="celebration-overlay" class="celebration-overlay">
   <div id="cel-confetti" class="cel-confetti"></div>
@@ -154,6 +205,7 @@
 <script src="js/leaderboard.js"></script>
 <script src="js/history.js"></script>
 <script src="js/submit.js"></script>
+<script src="js/profile.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

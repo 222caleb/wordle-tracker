@@ -7,6 +7,7 @@ function switchTab(name, btn) {
   if (name === 'leaderboard') renderLeaderboard(true);
   if (name === 'history') renderHistory();
   if (name === 'submit') renderTodayScores();
+  if (name === 'halloffame') renderHallOfFame();
 }
 
 function updateTabIndicator(btn) {
@@ -257,7 +258,7 @@ async function showCelebration(winner, others, monthName, prevMonth, prevYear) {
     const color = PLAYER_COLORS[p.player] || '#555';
     const hasSent = sentSet.has(p.player);
     return `<div class="cel-card" id="cel-card-${p.player}" style="animation-delay:${700 + i * 180}ms">
-      <div class="cel-avatar" style="background:${color}">${p.player[0]}</div>
+      ${avatarImgHTML(p.player, 'cel-avatar')}
       <div class="cel-pname">${p.player}</div>
       <div class="${hasSent ? 'cel-sent' : 'cel-waiting'}">${hasSent ? 'SENT ✓' : 'waiting...'}</div>
     </div>`;

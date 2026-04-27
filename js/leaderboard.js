@@ -155,7 +155,6 @@ function renderLeaderboard(shouldAnimate = false) {
 
     const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
     const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
-    const avatarColor = PLAYER_COLORS[s.player] || '#555';
     const sparklineHTML = buildSparkline(s.allEntries);
     const seasonPts = getMonthPoints(s.player, currentMonth);
 
@@ -192,7 +191,7 @@ function renderLeaderboard(shouldAnimate = false) {
         ${rankLabel}
         <div class="player-name">
           ${medal}
-          <div class="player-avatar" style="background:${avatarColor}">${s.player[0]}</div>
+          ${avatarImgHTML(s.player, 'player-avatar', true)}
           ${s.player}
           <div class="name-right">
             ${sparklineHTML}
