@@ -212,20 +212,12 @@ function checkCelebration() {
 
   if (!stats.length) return;
   localStorage.setItem(key, '1');
-  showCelebration(stats[0], stats.slice(1), FULL_MONTHS[prevMonth]);
+  showCelebration(stats[0], stats.slice(1), FULL_MONTHS[prevMonth], prevMonth, prevYear);
 }
 
-function showCelebration(winner, others, monthName) {
-  const msgs = [
-    "fair and square! 👏",
-    "buy me dinner 🍕",
-    "rematch next month! 💪",
-    "respect. 🫡",
-    "don't spend it all at once 😅",
-    "i'll get you next time 😤",
-    "teach me your ways 🙏",
-  ];
+let _congratsChannel = null;
 
+async function showCelebration(winner, others, monthName, prevMonth, prevYear) {
   const overlay = document.getElementById('celebration-overlay');
   const winnerColor = PLAYER_COLORS[winner.player] || '#f5c518';
 
@@ -250,20 +242,71 @@ function showCelebration(winner, others, monthName) {
     return `<div class="cel-piece" style="left:${left}%;width:${size}px;height:${size}px;background:${c};border-radius:${round};animation-delay:${delay}s;animation-duration:${dur}s"></div>`;
   }).join('');
 
-  // congrats cards
-  document.getElementById('cel-congrats').innerHTML = others.map((p, i) => {
+  // fetch who has already sent congrats
+  const { data: existing } = await supabase
+    .from('congrats')
+    .select('from_player')
+    .eq('to_player', winner.player)
+    .eq('month', prevMonth)
+    .eq('year', prevYear);
+  const sentSet = new Set((existing || []).map(c => c.from_player));
+  const savedPlayer = localStorage.getItem('wordlePlayer');
+
+  function cardHTML(p, i) {
     const color = PLAYER_COLORS[p.player] || '#555';
-    const msg = msgs[i % msgs.length];
-    return `<div class="cel-card" style="animation-delay:${700 + i * 180}ms">
+    const hasSent = sentSet.has(p.player);
+    const isMe = p.player === savedPlayer;
+    let action;
+    if (hasSent) {
+      action = `<div class="cel-sent">SENT ✓</div>`;
+    } else if (isMe) {
+      action = `<button class="cel-send-btn" onclick="sendCongrats('${p.player}','${winner.player}',${prevMonth},${prevYear})">SEND CONGRATS</button>`;
+    } else {
+      action = `<div class="cel-waiting">waiting...</div>`;
+    }
+    return `<div class="cel-card" id="cel-card-${p.player}" style="animation-delay:${700 + i * 180}ms">
       <div class="cel-avatar" style="background:${color}">${p.player[0]}</div>
       <div class="cel-pname">${p.player}</div>
-      <div class="cel-msg">"${msg}"</div>
+      ${action}
     </div>`;
-  }).join('');
+  }
+
+  document.getElementById('cel-congrats').innerHTML = others.map(cardHTML).join('');
+
+  // realtime: flip cards as congrats come in
+  if (_congratsChannel) supabase.removeChannel(_congratsChannel);
+  _congratsChannel = supabase
+    .channel('congrats-live')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'congrats',
+      filter: `to_player=eq.${winner.player}`
+    }, payload => {
+      const card = document.getElementById(`cel-card-${payload.new.from_player}`);
+      if (!card) return;
+      const el = card.querySelector('.cel-send-btn, .cel-waiting');
+      if (el) el.outerHTML = '<div class="cel-sent cel-sent-flash">SENT ✓</div>';
+    })
+    .subscribe();
 
   overlay.classList.add('active');
 }
 
+async function sendCongrats(fromPlayer, toPlayer, month, year) {
+  const btn = document.querySelector(`#cel-card-${fromPlayer} .cel-send-btn`);
+  if (btn) { btn.disabled = true; btn.textContent = 'SENDING...'; }
+
+  const { error } = await supabase
+    .from('congrats')
+    .insert([{ from_player: fromPlayer, to_player: toPlayer, month, year }]);
+
+  if (error) {
+    if (btn) { btn.disabled = false; btn.textContent = 'SEND CONGRATS'; }
+    showToast('Could not send congrats', true);
+  }
+  // realtime subscription handles the card flip to SENT ✓
+}
+
 function closeCelebration() {
   document.getElementById('celebration-overlay').classList.remove('active');
+  if (_congratsChannel) { supabase.removeChannel(_congratsChannel); _congratsChannel = null; }
 }

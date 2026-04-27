@@ -1405,12 +1405,44 @@ a.history-wordle:hover {
   color: var(--text);
 }
 
-.cel-msg {
+.cel-send-btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.cel-send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.04); }
+.cel-send-btn:disabled { opacity: 0.5; cursor: default; }
+
+.cel-sent {
+  font-family: var(--mono);
   font-size: 0.65rem;
-  color: var(--text2);
-  text-align: center;
-  font-style: italic;
-  max-width: 110px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.08em;
+}
+
+@keyframes sentFlash {
+  0%   { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.cel-sent-flash { animation: sentFlash 0.35s ease both; }
+
+.cel-waiting {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text3);
+  letter-spacing: 0.05em;
 }
 
 .cel-close-btn {
