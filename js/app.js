@@ -302,8 +302,15 @@ async function sendCongrats(fromPlayer, toPlayer, month, year) {
   if (error) {
     if (btn) { btn.disabled = false; btn.textContent = 'SEND CONGRATS'; }
     showToast('Could not send congrats', true);
+    return;
   }
-  // realtime subscription handles the card flip to SENT ✓
+
+  // update sender's own card immediately; realtime handles other viewers
+  const card = document.getElementById(`cel-card-${fromPlayer}`);
+  if (card) {
+    const el = card.querySelector('.cel-send-btn, .cel-waiting');
+    if (el) el.outerHTML = '<div class="cel-sent cel-sent-flash">SENT ✓</div>';
+  }
 }
 
 function closeCelebration() {
