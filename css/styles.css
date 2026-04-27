@@ -1407,21 +1407,31 @@ a.history-wordle:hover {
 
 .cel-send-btn {
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   background: var(--green);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
   white-space: nowrap;
+  margin-bottom: 0.5rem;
 }
 
-.cel-send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.04); }
+.cel-send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.03); }
 .cel-send-btn:disabled { opacity: 0.5; cursor: default; }
+
+.cel-my-sent {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
 
 .cel-sent {
   font-family: var(--mono);

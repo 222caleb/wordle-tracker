@@ -252,39 +252,47 @@ async function showCelebration(winner, others, monthName, prevMonth, prevYear) {
   const sentSet = new Set((existing || []).map(c => c.from_player));
   const savedPlayer = localStorage.getItem('wordlePlayer');
 
-  function cardHTML(p, i) {
+  // cards show status only — no per-card buttons
+  document.getElementById('cel-congrats').innerHTML = others.map((p, i) => {
     const color = PLAYER_COLORS[p.player] || '#555';
     const hasSent = sentSet.has(p.player);
-    const isMe = p.player === savedPlayer;
-    let action;
-    if (hasSent) {
-      action = `<div class="cel-sent">SENT ✓</div>`;
-    } else if (isMe) {
-      action = `<button class="cel-send-btn" onclick="sendCongrats('${p.player}','${winner.player}',${prevMonth},${prevYear})">SEND CONGRATS</button>`;
-    } else {
-      action = `<div class="cel-waiting">waiting...</div>`;
-    }
     return `<div class="cel-card" id="cel-card-${p.player}" style="animation-delay:${700 + i * 180}ms">
       <div class="cel-avatar" style="background:${color}">${p.player[0]}</div>
       <div class="cel-pname">${p.player}</div>
-      ${action}
+      <div class="${hasSent ? 'cel-sent' : 'cel-waiting'}">${hasSent ? 'SENT ✓' : 'waiting...'}</div>
     </div>`;
+  }).join('');
+
+  // action button: one clear "send to winner" button below the grid
+  const isNonWinner = others.some(p => p.player === savedPlayer);
+  const iAlreadySent = sentSet.has(savedPlayer);
+  const actionEl = document.getElementById('cel-action');
+  if (isNonWinner && !iAlreadySent) {
+    actionEl.innerHTML = `<button class="cel-send-btn" id="cel-main-send-btn"
+      onclick="sendCongrats('${savedPlayer}','${winner.player}',${prevMonth},${prevYear})">
+      SEND CONGRATS TO ${winner.player.toUpperCase()} ↗
+    </button>`;
+  } else if (isNonWinner && iAlreadySent) {
+    actionEl.innerHTML = `<div class="cel-my-sent">You already sent your congrats ✓</div>`;
+  } else {
+    actionEl.innerHTML = '';
   }
 
-  document.getElementById('cel-congrats').innerHTML = others.map(cardHTML).join('');
-
-  // realtime: flip cards as congrats come in
+  // realtime: flip other players' cards as their congrats come in
+  // unique channel name per invocation prevents stale event replay
   if (_congratsChannel) supabase.removeChannel(_congratsChannel);
   _congratsChannel = supabase
-    .channel('congrats-live')
+    .channel(`congrats-${Date.now()}`)
     .on('postgres_changes', {
       event: 'INSERT', schema: 'public', table: 'congrats',
       filter: `to_player=eq.${winner.player}`
     }, payload => {
-      const card = document.getElementById(`cel-card-${payload.new.from_player}`);
-      if (!card) return;
-      const el = card.querySelector('.cel-send-btn, .cel-waiting');
-      if (el) el.outerHTML = '<div class="cel-sent cel-sent-flash">SENT ✓</div>';
+      const from = payload.new.from_player;
+      const card = document.getElementById(`cel-card-${from}`);
+      if (card) {
+        const el = card.querySelector('.cel-waiting');
+        if (el) el.outerHTML = '<div class="cel-sent cel-sent-flash">SENT ✓</div>';
+      }
     })
     .subscribe();
 
@@ -292,7 +300,7 @@ async function showCelebration(winner, others, monthName, prevMonth, prevYear) {
 }
 
 async function sendCongrats(fromPlayer, toPlayer, month, year) {
-  const btn = document.querySelector(`#cel-card-${fromPlayer} .cel-send-btn`);
+  const btn = document.getElementById('cel-main-send-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'SENDING...'; }
 
   const { error } = await supabase
@@ -300,15 +308,19 @@ async function sendCongrats(fromPlayer, toPlayer, month, year) {
     .insert([{ from_player: fromPlayer, to_player: toPlayer, month, year }]);
 
   if (error) {
-    if (btn) { btn.disabled = false; btn.textContent = 'SEND CONGRATS'; }
+    if (btn) { btn.disabled = false; btn.textContent = `SEND CONGRATS TO ${toPlayer.toUpperCase()} ↗`; }
     showToast('Could not send congrats', true);
     return;
   }
 
-  // update sender's own card immediately; realtime handles other viewers
+  // update the main action button
+  const actionEl = document.getElementById('cel-action');
+  if (actionEl) actionEl.innerHTML = '<div class="cel-my-sent">You sent your congrats ✓</div>';
+
+  // update this player's status card
   const card = document.getElementById(`cel-card-${fromPlayer}`);
   if (card) {
-    const el = card.querySelector('.cel-send-btn, .cel-waiting');
+    const el = card.querySelector('.cel-waiting');
     if (el) el.outerHTML = '<div class="cel-sent cel-sent-flash">SENT ✓</div>';
   }
 }
