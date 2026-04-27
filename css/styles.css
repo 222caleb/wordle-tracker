@@ -45,7 +45,6 @@ header {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--accent);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -180,7 +179,7 @@ header {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--text);
+  color: var(--accent);
 }
 
 .month-btn {
@@ -303,8 +302,7 @@ header {
 }
 
 .score-bar-wrap {
-  margin-top: 6px;
-  grid-column: 2 / -1;
+  display: none;
 }
 
 .score-bar {
@@ -381,7 +379,7 @@ input[type="password"] {
 select:focus,
 textarea:focus,
 input:focus {
-  border-color: var(--green);
+  border-color: var(--accent);
 }
 
 textarea {
@@ -666,7 +664,7 @@ textarea {
   background: linear-gradient(135deg, #1a3d1a, #0e2a1a, #1a1a1b, #1b1a2e, #1a2e1a);
   background-size: 300% 300%;
   animation: prizePulse 12s ease infinite;
-  border: 1px solid var(--green);
+  border: 1px solid var(--accent);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
@@ -680,7 +678,7 @@ textarea {
 .prize-title {
   font-family: var(--mono);
   font-size: 11px;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -807,7 +805,7 @@ textarea {
 
 /* Current month highlight */
 .month-label.current-month {
-  color: var(--green);
+  color: var(--accent);
 }
 
 /* Waiting on */
@@ -1517,7 +1515,7 @@ a.history-wordle:hover {
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: #f5c518;
+  color: var(--accent);
 }
 
 .hof-subtitle {
