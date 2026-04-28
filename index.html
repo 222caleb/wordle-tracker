@@ -4,7 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Wordle Tracker</title>
+  <title>Wordle Dordle</title>
+  <meta name="theme-color" content="#121213">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Wordle Dordle">
+  <link rel="icon" type="image/png" href="wordle-tracker.png">
+  <link rel="apple-touch-icon" href="wordle-tracker.png">
+  <link rel="manifest" href="manifest.json">
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap"
     rel="stylesheet">
@@ -176,7 +183,7 @@
       <button class="avatar-random-btn" onclick="randomizeSeed()">RANDOM</button>
     </div>
     <div class="avatar-picker-actions">
-      <button class="submit-btn" onclick="saveAvatar()">SAVE AVATAR</button>
+      <button class="submit-btn" onclick="saveAvatar(this)">SAVE AVATAR</button>
       <button class="cancel-btn" onclick="closeAvatarPicker()">CANCEL</button>
     </div>
   </div>
@@ -206,5 +213,10 @@
 <script src="js/submit.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
 </body>
 </html>

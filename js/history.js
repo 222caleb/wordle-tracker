@@ -22,8 +22,8 @@ function renderHistory() {
       : '';
     return `<div class="history-item">
       <div class="history-meta">
-        ${avatarImgHTML(e.player, 'player-avatar player-avatar-sm')}
-        <span class="history-player">${e.player}</span>
+        ${avatarImgHTML(e.player, 'player-avatar player-avatar-sm', true)}
+        <span class="history-player" onclick="openProfile('${e.player}', event)" style="cursor:pointer">${e.player}</span>
         <a class="history-wordle" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">#${e.puzzleNum}</a>
         <span class="history-date">${dateStr}</span>
       </div>

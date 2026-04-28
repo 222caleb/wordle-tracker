@@ -1786,8 +1786,9 @@ a.history-wordle:hover {
   z-index: 300;
   background: rgba(0,0,0,0.82);
   justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  align-items: flex-start;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
 }
 
 .avatar-picker-overlay.active { display: flex; }
@@ -1800,6 +1801,7 @@ a.history-wordle:hover {
   width: 100%;
   max-width: 400px;
   animation: celContentIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  margin: auto;
 }
 
 .avatar-picker-title {
@@ -1858,8 +1860,12 @@ a.history-wordle:hover {
   flex-wrap: wrap;
   gap: 7px;
   min-height: 56px;
+  max-height: 195px;
+  overflow-y: auto;
   margin-bottom: 1rem;
-  padding: 4px 0;
+  padding: 4px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 .color-swatch {

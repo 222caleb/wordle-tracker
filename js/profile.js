@@ -303,8 +303,9 @@ function randomizeSeed() {
   _renderBuilder();
 }
 
-async function saveAvatar() {
+async function saveAvatar(btn) {
   if (!_pickerPlayer) return;
+  if (btn) { btn.textContent = 'SAVING...'; btn.disabled = true; }
   const config = { style: 'adventurer', seed: _builderState.seed, attrs: _builderState.attrs };
 
   // save to localStorage immediately
@@ -319,7 +320,8 @@ async function saveAvatar() {
     );
   } catch(e) {}
 
-  closeAvatarPicker();
+  if (btn) { btn.textContent = 'SAVED! ✓'; }
+  setTimeout(() => closeAvatarPicker(), 600);
   renderProfileContent(_pickerPlayer);
   document.getElementById('profile-avatar-img').src = getAvatarUrl(_pickerPlayer);
   renderLeaderboard();

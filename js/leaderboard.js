@@ -192,7 +192,7 @@ function renderLeaderboard(shouldAnimate = false) {
         <div class="player-name">
           ${medal}
           ${avatarImgHTML(s.player, 'player-avatar', true)}
-          ${s.player}
+          <span onclick="openProfile('${s.player}', event)" style="cursor:pointer">${s.player}</span>
           <div class="name-right">
             ${sparklineHTML}
             <span class="expand-icon">▾</span>
