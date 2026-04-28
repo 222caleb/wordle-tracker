@@ -76,6 +76,7 @@ checkSession();
 fetchScores();
 subscribeToScores();
 checkHash();
+loadAvatars();
 
 // Position tab indicator on load without transition
 const _initTab = document.querySelector('.tab.active');

@@ -1900,6 +1900,18 @@ a.history-wordle:hover {
 .style-option:hover { transform: scale(1.08); border-color: var(--text2); }
 .style-option.selected { border-color: var(--accent); }
 
+.style-option-none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  border-style: dashed;
+}
+
 .style-option-img {
   width: 100%;
   height: 100%;
@@ -1910,22 +1922,9 @@ a.history-wordle:hover {
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
   margin-bottom: 1.25rem;
 }
-
-.avatar-seed-input {
-  flex: 1;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  padding: 0.45rem 0.7rem;
-  outline: none;
-}
-
-.avatar-seed-input:focus { border-color: var(--accent); }
 
 .avatar-random-btn {
   font-family: var(--mono);
