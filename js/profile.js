@@ -412,11 +412,19 @@ function renderWallOfShame() {
   container.innerHTML = [...entries].reverse().map(({ m, losers }) => {
     const losersHTML = losers.map(s => {
       const c = PLAYER_COLORS[s.player] || '#e74c3c';
+      const avId = `wos-av-${s.player}-${m}`;
       return `<div class="wos-loser">
         <div class="wos-skull">💀</div>
-        ${avatarImgHTML(s.player, 'player-avatar player-avatar-xl')}
+        <div id="${avId}" class="wos-avatar-wrap">
+          ${avatarImgHTML(s.player, 'player-avatar player-avatar-xl')}
+        </div>
         <div class="wos-loser-name" style="color:${c}">${s.player.toUpperCase()}</div>
         <div class="wos-loser-stats">${s.total} pts · ${s.avg.toFixed(2)} avg</div>
+        <button class="wos-throw-btn"
+          onmousedown="startThrowing('${avId}',this)" onmouseup="stopThrowing()" onmouseleave="stopThrowing()"
+          ontouchstart="startThrowing('${avId}',this);event.preventDefault()" ontouchend="stopThrowing()">
+          🍅 THROW
+        </button>
       </div>`;
     }).join('');
 
@@ -425,4 +433,88 @@ function renderWallOfShame() {
       <div class="wos-losers">${losersHTML}</div>
     </div>`;
   }).join('');
+}
+
+// --- Tomato Throwing ---
+let _throwInterval = null;
+
+function startThrowing(avatarId, btn) {
+  throwTomato(avatarId, btn);
+  _throwInterval = setInterval(() => throwTomato(avatarId, btn), 220);
+}
+
+function stopThrowing() {
+  clearInterval(_throwInterval);
+  _throwInterval = null;
+}
+
+function throwTomato(avatarId, btn) {
+  const avatarEl = document.getElementById(avatarId);
+  if (!avatarEl) return;
+
+  const btnRect = btn.getBoundingClientRect();
+  const avRect  = avatarEl.getBoundingClientRect();
+
+  const startX = btnRect.left + btnRect.width  / 2;
+  const startY = btnRect.top  + btnRect.height / 2;
+  const endX   = avRect.left  + avRect.width   / 2;
+  const endY   = avRect.top   + avRect.height  / 2;
+
+  const peakX = (startX + endX) / 2 + (Math.random() - 0.5) * 28;
+  const peakY = Math.min(startY, endY) - 55 - Math.random() * 45;
+  const rot   = 240 + Math.random() * 180;
+
+  const tomato = document.createElement('div');
+  tomato.className = 'tomato-projectile';
+  tomato.textContent = '🍅';
+  document.body.appendChild(tomato);
+
+  const anim = tomato.animate([
+    { left: startX + 'px', top: startY + 'px', transform: 'translate(-50%,-50%) scale(1) rotate(0deg)',         easing: 'ease-out' },
+    { left: peakX  + 'px', top: peakY  + 'px', transform: `translate(-50%,-50%) scale(1.3) rotate(${rot*.5}deg)`, easing: 'ease-in'  },
+    { left: endX   + 'px', top: endY   + 'px', transform: `translate(-50%,-50%) scale(0.5) rotate(${rot}deg)` },
+  ], { duration: 380 + Math.random() * 140, fill: 'forwards' });
+
+  anim.onfinish = () => {
+    tomato.remove();
+    splatAt(endX, endY, avRect.width, avatarEl);
+  };
+}
+
+function splatAt(cx, cy, avSize, avatarEl) {
+  // shake the avatar
+  avatarEl.animate([
+    { transform: 'translate(-4px,3px) rotate(-3deg)' },
+    { transform: 'translate(4px,-2px) rotate(2deg)'  },
+    { transform: 'translate(-2px,2px) rotate(-1deg)' },
+    { transform: 'translate(0,0) rotate(0deg)'       },
+  ], { duration: 280, easing: 'ease-out' });
+
+  const splat = document.createElement('div');
+  splat.className = 'tomato-splat';
+  splat.style.left   = cx + 'px';
+  splat.style.top    = cy + 'px';
+  splat.style.width  = avSize * 0.82 + 'px';
+  splat.style.height = avSize * 0.82 + 'px';
+  document.body.appendChild(splat);
+
+  const drips = 6 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < drips; i++) {
+    const drip  = document.createElement('div');
+    drip.className = 'tomato-drip';
+    const angle = (Math.PI * 2 / drips) * i + (Math.random() - 0.5) * 0.5;
+    const dist  = avSize * 0.42 + Math.random() * avSize * 0.22;
+    const dSize = 5 + Math.random() * 8;
+    drip.style.width  = dSize + 'px';
+    drip.style.height = dSize + 'px';
+    drip.style.left   = `calc(50% + ${Math.cos(angle) * dist}px)`;
+    drip.style.top    = `calc(50% + ${Math.sin(angle) * dist}px)`;
+    splat.appendChild(drip);
+  }
+
+  setTimeout(() => {
+    splat.style.transition = 'opacity 0.5s ease';
+    splat.style.opacity = '0';
+    setTimeout(() => splat.remove(), 500);
+  }, 1300);
 }
