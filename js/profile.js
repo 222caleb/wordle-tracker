@@ -328,6 +328,18 @@ async function saveAvatar(btn) {
 }
 
 // --- Hall of Fame ---
+function _monthStats(data, m, year) {
+  const md = data.filter(e => e.month === m && e.year === year);
+  if (!md.length) return null;
+  return PLAYERS.map(p => {
+    const pe = md.filter(e => e.player === p);
+    const scores = pe.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
+    const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
+    const avg   = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+    return { player: p, total, avg, count: scores.length };
+  }).filter(s => s.total !== null).sort((a,b) => a.total !== b.total ? a.total-b.total : a.avg-b.avg);
+}
+
 function renderHallOfFame() {
   const data = loadData();
   const now = new Date();
@@ -335,16 +347,8 @@ function renderHallOfFame() {
   const entries = [];
 
   for (let m = 0; m < now.getMonth(); m++) {
-    const md = data.filter(e => e.month === m && e.year === now.getFullYear());
-    if (!md.length) continue;
-    const stats = PLAYERS.map(p => {
-      const pe = md.filter(e => e.player === p);
-      const scores = pe.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
-      const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
-      const avg   = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-      return { player: p, total, avg, count: scores.length };
-    }).filter(s => s.total !== null).sort((a,b) => a.total !== b.total ? a.total-b.total : a.avg-b.avg);
-    if (stats.length) entries.push({ m, winner: stats[0], runners: stats.slice(1) });
+    const stats = _monthStats(data, m, now.getFullYear());
+    if (stats && stats.length >= 1) entries.push({ m, stats });
   }
 
   if (!entries.length) {
@@ -352,25 +356,73 @@ function renderHallOfFame() {
     return;
   }
 
-  container.innerHTML = [...entries].reverse().map(e => {
-    const wc = PLAYER_COLORS[e.winner.player] || '#f5c518';
+  container.innerHTML = [...entries].reverse().map(({ m, stats }) => {
+    const winner = stats[0];
+    const runnerUp = stats[1] || null;
+    const wc = PLAYER_COLORS[winner.player] || '#f5c518';
+    const rc = runnerUp ? (PLAYER_COLORS[runnerUp.player] || '#aaa') : null;
+
+    const runnerHTML = runnerUp ? `
+      <div class="hof-podium-runner">
+        <div class="hof-medal">🥈</div>
+        ${avatarImgHTML(runnerUp.player, 'player-avatar player-avatar-md')}
+        <div class="hof-podium-name hof-podium-name-sm" style="color:${rc}">${runnerUp.player.toUpperCase()}</div>
+        <div class="hof-podium-stats">${runnerUp.total} pts</div>
+      </div>` : '';
+
     return `<div class="hof-card">
-      <div class="hof-month-label">${FULL_MONTHS[e.m].toUpperCase()} ${now.getFullYear()}</div>
-      <div class="hof-winner-row">
-        <span class="hof-trophy">🏆</span>
-        ${avatarImgHTML(e.winner.player, 'player-avatar player-avatar-lg')}
-        <div class="hof-winner-info">
-          <div class="hof-winner-name" style="color:${wc}">${e.winner.player.toUpperCase()}</div>
-          <div class="hof-winner-stats">${e.winner.total} pts · ${e.winner.avg.toFixed(2)} avg · ${e.winner.count} games</div>
+      <div class="hof-month-label">${FULL_MONTHS[m].toUpperCase()} ${now.getFullYear()}</div>
+      <div class="hof-podium">
+        <div class="hof-podium-winner">
+          <div class="hof-trophy">🏆</div>
+          ${avatarImgHTML(winner.player, 'player-avatar player-avatar-xl')}
+          <div class="hof-podium-name hof-podium-name-lg" style="color:${wc}">${winner.player.toUpperCase()}</div>
+          <div class="hof-podium-stats">${winner.total} pts · ${winner.avg.toFixed(2)} avg</div>
         </div>
+        ${runnerHTML}
       </div>
-      <div class="hof-runners">
-        ${e.runners.map((s,i) => {
-          const rc = PLAYER_COLORS[s.player] || '#555';
-          const medal = ['🥈','🥉'][i] || `${i+2}.`;
-          return `<span class="hof-runner">${medal} <span style="color:${rc}">${s.player}</span> <span class="hof-runner-pts">${s.total} pts</span></span>`;
-        }).join('')}
-      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- Wall of Shame ---
+function renderWallOfShame() {
+  const data = loadData();
+  const now = new Date();
+  const container = document.getElementById('wos-list');
+  const entries = [];
+
+  for (let m = 0; m < now.getMonth(); m++) {
+    const stats = _monthStats(data, m, now.getFullYear());
+    if (!stats || stats.length < 1) continue;
+    // last place = highest total (worst score). check if 4th ties with 5th
+    const last = stats[stats.length - 1];
+    const secondLast = stats.length >= 2 ? stats[stats.length - 2] : null;
+    const losers = (secondLast && secondLast.total === last.total)
+      ? [secondLast, last]
+      : [last];
+    entries.push({ m, losers });
+  }
+
+  if (!entries.length) {
+    container.innerHTML = '<div class="wos-empty">No completed months yet — check back next month.</div>';
+    return;
+  }
+
+  container.innerHTML = [...entries].reverse().map(({ m, losers }) => {
+    const losersHTML = losers.map(s => {
+      const c = PLAYER_COLORS[s.player] || '#e74c3c';
+      return `<div class="wos-loser">
+        <div class="wos-skull">💀</div>
+        ${avatarImgHTML(s.player, 'player-avatar player-avatar-xl')}
+        <div class="wos-loser-name" style="color:${c}">${s.player.toUpperCase()}</div>
+        <div class="wos-loser-stats">${s.total} pts · ${s.avg.toFixed(2)} avg</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="wos-card">
+      <div class="wos-month-label">${FULL_MONTHS[m].toUpperCase()} ${now.getFullYear()}</div>
+      <div class="wos-losers">${losersHTML}</div>
     </div>`;
   }).join('');
 }

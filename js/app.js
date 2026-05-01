@@ -8,6 +8,7 @@ function switchTab(name, btn) {
   if (name === 'history') renderHistory();
   if (name === 'submit') renderTodayScores();
   if (name === 'halloffame') renderHallOfFame();
+  if (name === 'wallofshame') renderWallOfShame();
 }
 
 function updateTabIndicator(btn) {
