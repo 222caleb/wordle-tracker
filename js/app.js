@@ -61,13 +61,11 @@ function setHeaderDate() {
     now.toLocaleDateString('en-US', opts).toUpperCase() + '\n' + FULL_MONTHS[now.getMonth()].toUpperCase() + ' STANDINGS';
 }
 
-let _celebrationChecked = false;
 function renderAll() {
   renderLeaderboard();
   renderPrizeSection();
   renderHistory();
   renderTodayScores();
-  if (!_celebrationChecked) { _celebrationChecked = true; checkCelebration(); }
 }
 
 setHeaderDate();

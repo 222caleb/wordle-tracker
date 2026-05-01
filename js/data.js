@@ -1,6 +1,7 @@
 // --- Data ---
 function loadData() { return allScores; }
 
+let _celebrationChecked = false;
 async function fetchScores() {
   const { data, error } = await supabase
     .from('scores')
@@ -9,6 +10,7 @@ async function fetchScores() {
   if (!error) {
     allScores = data || [];
     renderAll();
+    if (!_celebrationChecked) { _celebrationChecked = true; checkCelebration(); }
   }
 }
 
