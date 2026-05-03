@@ -9,6 +9,7 @@ function switchTab(name, btn) {
   if (name === 'submit') renderTodayScores();
   if (name === 'halloffame') renderHallOfFame();
   if (name === 'wallofshame') renderWallOfShame();
+  // 'rules' is static HTML — no render call needed
 }
 
 function updateTabIndicator(btn) {

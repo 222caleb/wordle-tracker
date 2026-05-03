@@ -71,19 +71,13 @@
     <button class="tab" onclick="switchTab('history', this)">HISTORY</button>
     <button class="tab" onclick="switchTab('halloffame', this)">HALL OF FAME</button>
     <button class="tab" onclick="switchTab('wallofshame', this)">WALL OF SHAME</button>
+    <button class="tab" onclick="switchTab('rules', this)">RULES</button>
     <div class="tab-indicator"></div>
   </div>
 
   <!-- LEADERBOARD -->
   <div id="tab-leaderboard" class="tab-content active">
-    <div class="prize-banner">
-      <div class="prize-left">
-        <div class="prize-title">Grand Prize</div>
-        <div class="prize-amount">$100</div>
-        <div class="prize-sub">Lowest avg score wins each month · most points by Dec wins all</div>
-      </div>
-      <div class="points-grid" id="points-grid"></div>
-    </div>
+    <div class="season-section" id="season-section"></div>
     <div class="month-nav">
       <button class="month-btn" onclick="changeMonth(-1)">&#8592;</button>
       <div class="month-label" id="month-label"></div>
@@ -145,6 +139,81 @@
       <div class="hof-subtitle">Monthly champions</div>
     </div>
     <div id="hof-list" class="hof-list"></div>
+  </div>
+
+  <!-- RULES -->
+  <div id="tab-rules" class="tab-content">
+    <div class="rules-page">
+      <div class="rules-hero">
+        <div class="rules-hero-tiles">
+          <div class="rules-tile tile-x"></div>
+          <div class="rules-tile tile-g"></div>
+          <div class="rules-tile tile-y"></div>
+          <div class="rules-tile tile-g"></div>
+          <div class="rules-tile tile-g"></div>
+        </div>
+        <div class="rules-hero-title">THE RULES</div>
+        <div class="rules-hero-sub">Family Wordle · 2026 Season</div>
+      </div>
+
+      <div class="rules-cards">
+
+        <div class="rules-card">
+          <div class="rules-card-icon">📋</div>
+          <div class="rules-card-title">HOW TO PLAY</div>
+          <ul class="rules-list">
+            <li>Play the <strong>NYT Wordle</strong> every day — same puzzle for everyone</li>
+            <li>After finishing, tap Share and <strong>paste your result</strong> in the Submit Score tab</li>
+            <li>Scores are tracked per player, per day</li>
+            <li>No double submissions — one score per puzzle per player</li>
+          </ul>
+        </div>
+
+        <div class="rules-card">
+          <div class="rules-card-icon">🎯</div>
+          <div class="rules-card-title">SCORING</div>
+          <ul class="rules-list">
+            <li>Your score is the <strong>number of guesses used</strong> (1–6)</li>
+            <li>Failed puzzle <strong>(X/6)</strong> counts as <strong>7 points</strong></li>
+            <li><strong>Lower score = better</strong> — this ain't golf, think Wordle</li>
+            <li>Monthly rank is decided by <strong>total points</strong>, tiebroken by avg</li>
+          </ul>
+        </div>
+
+        <div class="rules-card">
+          <div class="rules-card-icon">🏆</div>
+          <div class="rules-card-title">MONTHLY WINNER</div>
+          <ul class="rules-list">
+            <li>Player with the <strong>lowest total score</strong> wins the month</li>
+            <li>Tiebreaker: lowest <strong>average score per game</strong></li>
+            <li>Monthly winner earns <strong>1 season point</strong></li>
+            <li>Winner gets bragging rights and eternal Hall of Fame glory</li>
+          </ul>
+        </div>
+
+        <div class="rules-card rules-card-prize">
+          <div class="rules-card-icon">💰</div>
+          <div class="rules-card-title">GRAND PRIZE</div>
+          <div class="rules-prize-amount">$100</div>
+          <ul class="rules-list">
+            <li>Player with the <strong>most season points</strong> at end of December wins</li>
+            <li>Season runs <strong>January – December 2026</strong></li>
+            <li>Tie for season points? Split the prize</li>
+          </ul>
+        </div>
+
+        <div class="rules-card">
+          <div class="rules-card-icon">💀</div>
+          <div class="rules-card-title">WALL OF SHAME</div>
+          <ul class="rules-list">
+            <li>Last place finisher each month gets immortalized on the Wall of Shame</li>
+            <li>If two players tie for last, both get shamed</li>
+            <li>You can throw tomatoes at them — it's encouraged</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- WALL OF SHAME -->

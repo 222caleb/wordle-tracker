@@ -292,7 +292,7 @@ header {
 }
 
 .stat-val.good {
-  color: var(--green);
+  color: var(--text);
 }
 
 .stat-val.best {
@@ -666,70 +666,209 @@ textarea {
 }
 
 /* Prize */
-.prize-banner {
-  background: linear-gradient(135deg, #1a3d1a, #0e2a1a, #1a1a1b, #1b1a2e, #1a2e1a);
-  background-size: 300% 300%;
-  animation: prizePulse 12s ease infinite;
-  border: 1px solid var(--accent);
+/* ── Season standings ── */
+.season-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   margin-bottom: 2rem;
+}
+
+.season-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
+  margin-bottom: 0.75rem;
 }
 
-.prize-title {
+.season-label {
   font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text3);
 }
 
-.prize-amount {
-  font-size: 24px;
+.season-prize-badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
   font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #f5c518;
+  background: rgba(245,197,24,0.1);
+  border: 1px solid rgba(245,197,24,0.25);
+  border-radius: 20px;
+  padding: 2px 10px;
 }
 
-.prize-sub {
-  font-size: 12px;
-  color: var(--text2);
-  margin-top: 2px;
-}
-
-.points-grid {
+.season-chips {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
-.points-chip {
+.season-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 14px;
-  text-align: center;
+  border-radius: 8px;
+  padding: 7px 10px;
+  flex: 1;
+  min-width: 130px;
+  transition: border-color 0.15s;
 }
 
-.points-chip .p-name {
-  font-size: 12px;
-  color: var(--text2);
-  margin-bottom: 2px;
+.season-chip.leading {
+  border-color: var(--accent);
+  background: rgba(136,120,240,0.07);
 }
 
-.points-chip .p-pts {
+.season-chip-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.season-chip-name {
   font-family: var(--mono);
-  font-size: 18px;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--text);
+  letter-spacing: 0.05em;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.points-chip .p-pts.leading {
-  color: var(--green);
+.season-chip.leading .season-chip-name { color: var(--text); }
+
+.season-chip-pts {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text3);
+  line-height: 1;
+}
+
+.season-chip.leading .season-chip-pts { color: var(--accent); }
+
+.season-chip-crown { font-size: 0.75rem; line-height: 1; }
+
+/* ── Rules page ── */
+.rules-page {
+  padding-bottom: 2rem;
+}
+
+.rules-hero {
+  text-align: center;
+  padding: 1.5rem 1rem 1.25rem;
+}
+
+.rules-hero-tiles {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.rules-tile {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
+
+.rules-tile.tile-x { background: var(--gray); }
+.rules-tile.tile-g { background: var(--green); }
+.rules-tile.tile-y { background: var(--yellow); }
+
+.rules-hero-title {
+  font-family: var(--mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.rules-hero-sub {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  margin-top: 4px;
+}
+
+.rules-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 1rem;
+}
+
+.rules-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+}
+
+.rules-card-prize {
+  border-color: rgba(245,197,24,0.35);
+  background: rgba(245,197,24,0.04);
+}
+
+.rules-card-icon {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.rules-card-title {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.rules-card-prize .rules-card-title { color: #f5c518; }
+
+.rules-prize-amount {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f5c518;
+  margin-bottom: 0.6rem;
+  line-height: 1;
+}
+
+.rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rules-list li {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.45;
+  padding-left: 1em;
+  position: relative;
+}
+
+.rules-list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--text3);
+}
+
+.rules-list li strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* Modal */
@@ -1058,11 +1197,6 @@ a.history-wordle:hover {
 }
 
 /* ── Prize banner gradient animation ── */
-@keyframes prizePulse {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
 
 /* ── Today scores tile flip ── */
 .today-flip-wrap {

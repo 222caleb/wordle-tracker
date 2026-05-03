@@ -153,7 +153,7 @@ function renderLeaderboard(shouldAnimate = false) {
     else if (isBronze) { rankLabel = '<span class="rank bronze">3</span>'; medal = '<span class="medal">🥉</span>'; }
     else               { rankLabel = `<span class="rank">${i+1}</span>`;   medal = ''; }
 
-    const avgClass = s.avg !== null && s.avg <= 3.5 ? 'stat-val good' : 'stat-val';
+    const avgClass = 'stat-val';
     const barWidth = s.count ? Math.round((s.count / maxCount) * 100) : 0;
     const sparklineHTML = buildSparkline(s.allEntries);
     const seasonPts = getMonthPoints(s.player, currentMonth);
@@ -234,18 +234,34 @@ function renderLeaderboard(shouldAnimate = false) {
   });
 }
 
-// --- Prize section ---
+// --- Season section ---
 function renderPrizeSection() {
   const pts = computeMonthlyPoints(currentMonth);
   const maxPts = Math.max(...Object.values(pts));
-  const grid = document.getElementById('points-grid');
-  grid.innerHTML = PLAYERS.map(p => {
-    const isLeading = pts[p] === maxPts && maxPts > 0;
-    return `<div class="points-chip">
-      <div class="p-name">${p}</div>
-      <div class="p-pts${isLeading ? ' leading' : ''}">${pts[p]}</div>
+  const isAnyPts = maxPts > 0;
+
+  const sorted = [...PLAYERS].sort((a, b) => pts[b] - pts[a]);
+
+  const chipsHTML = sorted.map(p => {
+    const isLeading = isAnyPts && pts[p] === maxPts;
+    const crown = isLeading ? '<span class="season-chip-crown">👑</span>' : '';
+    return `<div class="season-chip${isLeading ? ' leading' : ''}">
+      ${avatarImgHTML(p, 'player-avatar player-avatar-sm')}
+      <div class="season-chip-info">
+        <div class="season-chip-name">${p.toUpperCase()}</div>
+        <div class="season-chip-pts">${pts[p]}</div>
+      </div>
+      ${crown}
     </div>`;
   }).join('');
+
+  document.getElementById('season-section').innerHTML = `
+    <div class="season-header">
+      <div class="season-label">SEASON STANDINGS</div>
+      <div class="season-prize-badge">💰 $100 GRAND PRIZE</div>
+    </div>
+    <div class="season-chips">${chipsHTML}</div>
+  `;
 }
 
 function changeMonth(dir) {
