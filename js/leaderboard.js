@@ -3,13 +3,14 @@ function computeMonthlyPoints(upToMonth) {
   const data = loadData();
   const now = new Date();
   const limit = upToMonth !== undefined ? upToMonth : now.getMonth();
+  const players = getPlayers();
   const pts = {};
-  PLAYERS.forEach(p => pts[p] = 0);
+  players.forEach(p => pts[p] = 0);
 
   for (let m = 0; m < limit; m++) {
     const monthData = data.filter(e => e.month === m && e.year === now.getFullYear());
     if (!monthData.length) continue;
-    const stats = PLAYERS.map(p => {
+    const stats = players.map(p => {
       const entries = monthData.filter(e => e.player === p);
       const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
       const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
@@ -43,12 +44,10 @@ function buildSparkline(playerScores) {
 
   const pts = vals.map((v, i) => {
     const x = (i / (vals.length - 1)) * W;
-    // lower score = lower y = higher on chart (better performance = line goes up)
     const y = ((v - min) / range) * (H - 6) + 3;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
 
-  // negative trend = recent scores lower = improving = green
   const trend = vals[vals.length - 1] - vals[0];
   const color = trend < 0 ? '#538d4e' : trend > 0 ? '#e67e22' : '#565758';
   const lastX = W;
@@ -99,6 +98,7 @@ function toggleDist(card) {
 
 function renderLeaderboard(shouldAnimate = false) {
   const data = loadData();
+  const players = getPlayers();
   const monthData = data.filter(e => e.month === currentMonth && e.year === new Date().getFullYear());
 
   const monthLabelEl = document.getElementById('month-label');
@@ -107,7 +107,7 @@ function renderLeaderboard(shouldAnimate = false) {
 
   const showSeasonPts = hasSeasonPoints(currentMonth);
 
-  const stats = PLAYERS.map(p => {
+  const stats = players.map(p => {
     const entries = monthData.filter(e => e.player === p);
     const allEntries = data.filter(e => e.player === p);
     const scores = entries.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
@@ -237,10 +237,12 @@ function renderLeaderboard(shouldAnimate = false) {
 // --- Season section ---
 function renderPrizeSection() {
   const pts = computeMonthlyPoints(currentMonth);
-  const maxPts = Math.max(...Object.values(pts));
+  const players = getPlayers();
+  const maxPts = Math.max(...Object.values(pts), 0);
   const isAnyPts = maxPts > 0;
 
-  const sorted = [...PLAYERS].sort((a, b) => pts[b] - pts[a]);
+  const sorted = [...players].sort((a, b) => (pts[b] || 0) - (pts[a] || 0));
+  const prizeAmt = currentCompetition ? `$${currentCompetition.prize_amount || 0} GRAND PRIZE` : '';
 
   const chipsHTML = sorted.map(p => {
     const isLeading = isAnyPts && pts[p] === maxPts;
@@ -249,7 +251,7 @@ function renderPrizeSection() {
       ${avatarImgHTML(p, 'player-avatar player-avatar-sm')}
       <div class="season-chip-info">
         <div class="season-chip-name">${p.toUpperCase()}</div>
-        <div class="season-chip-pts">${pts[p]}</div>
+        <div class="season-chip-pts">${pts[p] || 0}</div>
       </div>
       ${crown}
     </div>`;
@@ -258,7 +260,7 @@ function renderPrizeSection() {
   document.getElementById('season-section').innerHTML = `
     <div class="season-header">
       <div class="season-label">SEASON STANDINGS</div>
-      <div class="season-prize-badge">💰 $100 GRAND PRIZE</div>
+      ${prizeAmt ? `<div class="season-prize-badge">💰 ${prizeAmt}</div>` : ''}
     </div>
     <div class="season-chips">${chipsHTML}</div>
   `;

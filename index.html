@@ -19,6 +19,73 @@
 </head>
 <body>
 
+<!-- Landing overlay — shown when no competition is stored in localStorage -->
+<div id="landing-overlay" class="landing-overlay">
+
+  <!-- Home screen -->
+  <div id="landing-home" class="landing-screen">
+    <div class="landing-logo">
+      <div class="logo-tiles">
+        <div class="logo-tile tile-x"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-y"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-g"></div>
+      </div>
+      <div class="landing-logo-text">WORDLE DORDLE</div>
+    </div>
+    <div class="landing-tagline">Family Wordle Competitions</div>
+    <button class="landing-btn landing-btn-primary" onclick="showCreateScreen()">CREATE COMPETITION</button>
+    <button class="landing-btn landing-btn-secondary" onclick="showJoinScreen()">JOIN WITH CODE</button>
+  </div>
+
+  <!-- Create screen -->
+  <div id="landing-create" class="landing-screen" style="display:none">
+    <button class="landing-back" onclick="showLandingHome()">← BACK</button>
+    <div class="landing-title">NEW COMPETITION</div>
+    <div class="landing-form">
+      <label class="landing-label">Competition Name</label>
+      <input type="text" id="create-comp-name" class="landing-input" placeholder="Family Wordle 2026" maxlength="40">
+      <div class="landing-row">
+        <div class="landing-row-col">
+          <label class="landing-label">Prize ($)</label>
+          <input type="number" id="create-prize" class="landing-input" value="100" min="0">
+        </div>
+        <div class="landing-row-col">
+          <label class="landing-label">Season Year</label>
+          <input type="number" id="create-year" class="landing-input" value="2026">
+        </div>
+      </div>
+      <label class="landing-label">Players <span class="landing-label-sub">(first player = you on this device)</span></label>
+      <div id="create-members-list"></div>
+      <div id="create-color-picker" class="create-color-picker" style="display:none"></div>
+      <button class="landing-add-btn" onclick="_addCreateMember()">+ ADD PLAYER</button>
+      <div class="landing-error" id="create-error"></div>
+      <button class="landing-btn landing-btn-primary" id="create-submit-btn" onclick="submitCreateCompetition()">CREATE COMPETITION</button>
+    </div>
+  </div>
+
+  <!-- Join screen -->
+  <div id="landing-join" class="landing-screen" style="display:none">
+    <button class="landing-back" onclick="showLandingHome()">← BACK</button>
+    <div class="landing-title">JOIN COMPETITION</div>
+    <div class="landing-form">
+      <label class="landing-label">Invite Code</label>
+      <input type="text" id="join-invite-code" class="landing-input landing-code-input"
+        placeholder="ABC-DEF" maxlength="7"
+        oninput="this.value=this.value.toUpperCase();previewInviteCode()">
+      <div id="join-members-preview" class="join-members-preview"></div>
+      <label class="landing-label">Your Name</label>
+      <select id="join-player-name" class="landing-input">
+        <option value="">Enter code above first...</option>
+      </select>
+      <div class="landing-error" id="join-error"></div>
+      <button class="landing-btn landing-btn-primary" id="join-submit-btn" onclick="submitJoinCompetition()">JOIN</button>
+    </div>
+  </div>
+
+</div>
+
 <header>
   <div class="logo">
     <div class="logo-tiles">
@@ -59,7 +126,7 @@
 <div class="main">
   <div class="hero-section">
     <div class="hero-name glitch" data-text="FAMILY WORDLE">FAMILY <span>WORDLE</span></div>
-    <div class="hero-title">DAILY TRACKER &nbsp;|&nbsp; FAMILY COMPETITION &nbsp;|&nbsp; APRIL 2026</div>
+    <div class="hero-title" id="hero-title">DAILY TRACKER &nbsp;|&nbsp; FAMILY COMPETITION</div>
     <div class="hero-terminal">
       <span class="terminal-prompt">$&nbsp;</span><span id="terminalText"></span><span class="cursor">▋</span>
     </div>
@@ -89,6 +156,38 @@
   <!-- SUBMIT -->
   <div id="tab-submit" class="tab-content">
 
+    <div class="submit-card">
+      <div class="submit-title">Post Your Score</div>
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Your Name</label>
+        <select id="submit-player">
+          <option value="">Select...</option>
+        </select>
+      </div>
+
+      <div class="submit-section-label">QUICK SUBMIT</div>
+      <div class="quick-score-grid">
+        <button class="quick-score-btn score-btn-1" data-score="1" onclick="selectQuickScore('1',this)">1</button>
+        <button class="quick-score-btn score-btn-2" data-score="2" onclick="selectQuickScore('2',this)">2</button>
+        <button class="quick-score-btn score-btn-3" data-score="3" onclick="selectQuickScore('3',this)">3</button>
+        <button class="quick-score-btn score-btn-4" data-score="4" onclick="selectQuickScore('4',this)">4</button>
+        <button class="quick-score-btn score-btn-5" data-score="5" onclick="selectQuickScore('5',this)">5</button>
+        <button class="quick-score-btn score-btn-6" data-score="6" onclick="selectQuickScore('6',this)">6</button>
+        <button class="quick-score-btn score-btn-X" data-score="X" onclick="selectQuickScore('X',this)">X</button>
+      </div>
+      <div id="quick-preview" class="quick-preview"></div>
+
+      <div class="or-divider"><span>OR PASTE RESULT</span></div>
+
+      <div class="form-group" style="margin-bottom:8px">
+        <textarea id="submit-text" placeholder="Wordle 1,747 4/6&#10;⬜⬜⬜⬜⬜&#10;🟩⬜⬜⬜⬜&#10;🟩⬜⬜⬜🟩&#10;🟩🟩🟩🟩🟩"></textarea>
+      </div>
+      <button class="paste-btn" onclick="pasteFromClipboard()">📋 PASTE FROM CLIPBOARD</button>
+      <div id="parse-preview" class="parse-preview-text"></div>
+
+      <button class="submit-btn" style="margin-top:1rem;width:100%" onclick="submitScore()">SUBMIT ↗</button>
+    </div>
+
     <div class="today-card">
       <div class="today-title">
         <span>TODAY'S SCORES</span>
@@ -99,35 +198,12 @@
       </div>
     </div>
 
-    <div class="submit-card">
-      <div class="submit-title">Post Your Score</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Your Name</label>
-          <select id="submit-player">
-            <option value="">Select...</option>
-            <option>Jeff</option><option>Tristan</option><option>Nana</option><option>Daniel</option><option>Caleb</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group" style="margin-bottom:14px">
-        <label>Paste Your Wordle Result</label>
-        <textarea id="submit-text" placeholder="Wordle 1,747 4/6&#10;⬜⬜⬜⬜⬜&#10;🟩⬜⬜⬜⬜&#10;🟩⬜⬜⬜🟩&#10;🟩🟩🟩🟩🟩"></textarea>
-      </div>
-      <div id="parse-preview" style="margin-bottom:14px; font-family: var(--mono); font-size:13px; color: var(--green); min-height:20px;"></div>
-      <button class="submit-btn" onclick="submitScore()">SUBMIT ↗</button>
-    </div>
   </div>
 
   <!-- HISTORY -->
   <div id="tab-history" class="tab-content">
-    <div class="history-filters">
+    <div class="history-filters" id="history-filters">
       <button class="filter-btn active" onclick="filterHistory('ALL', this)">ALL</button>
-      <button class="filter-btn" onclick="filterHistory('Jeff', this)">Jeff</button>
-      <button class="filter-btn" onclick="filterHistory('Tristan', this)">Tristan</button>
-      <button class="filter-btn" onclick="filterHistory('Nana', this)">Nana</button>
-      <button class="filter-btn" onclick="filterHistory('Daniel', this)">Daniel</button>
-      <button class="filter-btn" onclick="filterHistory('Caleb', this)">Caleb</button>
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
@@ -285,6 +361,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js"></script>
+<script src="js/competition.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/data.js"></script>
 <script src="js/leaderboard.js"></script>

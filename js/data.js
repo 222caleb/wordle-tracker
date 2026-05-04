@@ -3,9 +3,11 @@ function loadData() { return allScores; }
 
 let _celebrationChecked = false;
 async function fetchScores() {
+  if (!currentCompetition) return;
   const { data, error } = await supabase
-    .from('scores')
+    .from('scores_v2')
     .select('*')
+    .eq('competition_id', currentCompetition.id)
     .order('id', { ascending: false });
   if (!error) {
     allScores = data || [];
@@ -15,10 +17,13 @@ async function fetchScores() {
 }
 
 function subscribeToScores() {
-  if (scoresChannel) return;
+  if (scoresChannel || !currentCompetition) return;
   scoresChannel = supabase
-    .channel('scores-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'scores' }, () => fetchScores())
+    .channel('scores-changes-' + currentCompetition.id)
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'scores_v2',
+      filter: `competition_id=eq.${currentCompetition.id}`
+    }, () => fetchScores())
     .subscribe();
 }
 
@@ -41,6 +46,9 @@ document.getElementById('submit-text').addEventListener('input', function() {
       ? `Wordle #${r.puzzleNum} · Score: X (failed)`
       : `Wordle #${r.puzzleNum} · Score: ${r.score}/6`;
     el.style.color = 'var(--green)';
+    _quickScore = null;
+    document.querySelectorAll('.quick-score-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('quick-preview').style.display = 'none';
   } else if (this.value.trim()) {
     el.textContent = 'Could not parse — make sure you paste the full Wordle share text';
     el.style.color = '#e67e22';

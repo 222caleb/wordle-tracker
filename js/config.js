@@ -3,25 +3,39 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let allScores = [];
+// App state
+let allScores   = [];
 let scoresChannel = null;
-let isAdmin = false;
+let isAdmin     = false;
 let currentMonth = new Date().getMonth();
 let historyFilter = 'ALL';
 
-const PLAYERS = ['Jeff','Tristan','Nana','Daniel','Caleb'];
+// Competition context — populated by competition.js on load
+let currentCompetition = null; // { id, name, invite_code, prize_amount, season_year, members[] }
+let currentPlayer = null;      // display_name of the person on this device
 
-const PLAYER_COLORS = {
-  Jeff:    '#e67e22',
-  Tristan: '#9b59b6',
-  Nana:    '#e74c3c',
-  Daniel:  '#3498db',
-  Caleb:   '#1abc9c',
-};
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const FULL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+// Dynamic player helpers — replace hardcoded PLAYERS / PLAYER_COLORS everywhere
+function getPlayers() {
+  return currentCompetition ? currentCompetition.members.map(m => m.display_name) : [];
+}
 
-// Hardcoded
+function getPlayerColor(name) {
+  if (!currentCompetition) return '#888';
+  const m = currentCompetition.members.find(m => m.display_name === name);
+  return m ? (m.color || '#888') : '#888';
+}
+
+const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const FULL_MONTHS = ['January','February','March','April','May','June','July',
+                     'August','September','October','November','December'];
+
+// Color palette for the competition creator to pick from
+const MEMBER_PALETTE = [
+  '#e67e22','#9b59b6','#e74c3c','#3498db','#1abc9c',
+  '#f5c518','#2ecc71','#e91e63','#8878f0','#ff5722',
+  '#00bcd4','#795548','#607d8b','#f06292','#aed581',
+];
+
 const FAIL_GIFS = [
   'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWg2YTk3amgyMWVjbzdsb3ViZzB4eDE5dXQ2ajNpMnh1aDloYWQ0byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4bDXKRN2arfPy/giphy.gif',
   'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzFzZnJ1OGd3N2Rvd3VncjluMnJ4c3d1MXN1NDBjd2E3eWowZmI2eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/aRr0zGv8fp1Tuw9Ggr/giphy.gif',
@@ -35,26 +49,13 @@ const CLOSE_CALL_GIFS = [
   'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGdma2pqZW1wdWl6dmhvbm51M25kMmNhbHUxa3U0djg0cGtqNWVtbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/bxOtA69x3IB20/giphy.gif',
 ];
 
-function getFailGif() {
-  return FAIL_GIFS[Math.floor(Math.random() * FAIL_GIFS.length)];
-}
-
-function getCloseCallGif() {
-  return CLOSE_CALL_GIFS[Math.floor(Math.random() * CLOSE_CALL_GIFS.length)];
-}
+function getFailGif()      { return FAIL_GIFS[Math.floor(Math.random() * FAIL_GIFS.length)]; }
+function getCloseCallGif() { return CLOSE_CALL_GIFS[Math.floor(Math.random() * CLOSE_CALL_GIFS.length)]; }
 
 function getReaction(score) {
-  if (score === 1 || score === 2) {
-    return { text: 'KABLOOIE!!', cls: 'reaction-kablooie' };
-  }
-  if (score === 3) {
-    return { text: '💥', cls: 'reaction-boom' };
-  }
-  if (score === 5 || score === '5') {
-    return { gif: getCloseCallGif(), cls: 'reaction-close' };
-  }
-  if (score === 'X' || score === 6 || score === '6') {
-    return { gif: getFailGif(), cls: 'reaction-rip' };
-  }
+  if (score === 1 || score === 2)          return { text: 'KABLOOIE!!', cls: 'reaction-kablooie' };
+  if (score === 3)                         return { text: '💥', cls: 'reaction-boom' };
+  if (score === 5 || score === '5')        return { gif: getCloseCallGif(), cls: 'reaction-close' };
+  if (score === 'X' || score === 6 || score === '6') return { gif: getFailGif(), cls: 'reaction-rip' };
   return null;
 }

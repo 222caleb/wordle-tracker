@@ -63,7 +63,6 @@ const CHAR_BUILDER = {
   },
 };
 
-// Array-type params that need [] notation in the DiceBear v9 API
 const ARRAY_PARAMS = new Set(['skinColor','hair','hairColor','eyes','eyebrows','mouth',
                               'earrings','glasses','backgroundColor']);
 
@@ -71,8 +70,12 @@ const ARRAY_PARAMS = new Set(['skinColor','hair','hairColor','eyes','eyebrows','
 let _avatarCache = {};
 
 async function loadAvatars() {
+  if (!currentCompetition) return;
   try {
-    const { data, error } = await supabase.from('avatars').select('player, config');
+    const { data, error } = await supabase
+      .from('avatars_v2')
+      .select('player, config')
+      .eq('competition_id', currentCompetition.id);
     if (!error && data) {
       data.forEach(row => { _avatarCache[row.player] = row.config; });
       renderLeaderboard();
@@ -123,7 +126,7 @@ function _buildDiceBearUrl(attrs, seed) {
 
 function avatarImgHTML(player, className = 'player-avatar', clickable = false) {
   const url = getAvatarUrl(player);
-  const color = PLAYER_COLORS[player] || '#555';
+  const color = getPlayerColor(player);
   const clickAttr = clickable
     ? `onclick="openProfile('${player}', event)" title="View ${player}'s profile" style="background:${color};cursor:pointer"`
     : `style="background:${color}"`;
@@ -152,8 +155,8 @@ function closeProfile() {
 function renderProfileContent(player) {
   const data = loadData();
   const now = new Date();
-  const isMe = player === localStorage.getItem('wordlePlayer');
-  const color = PLAYER_COLORS[player] || '#f5c518';
+  const isMe = player === currentPlayer;
+  const color = getPlayerColor(player);
 
   const all = data.filter(e => e.player === player);
   const allS = all.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
@@ -174,7 +177,8 @@ function renderProfileContent(player) {
     if (ma > worstA) { worstA = ma; worstM = m; }
   }
 
-  const rankStats = PLAYERS.map(p => {
+  const players = getPlayers();
+  const rankStats = players.map(p => {
     const pe = data.filter(e => e.player === p && e.month === now.getMonth() && e.year === now.getFullYear());
     const ps = pe.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
     const pt = ps.length ? ps.reduce((a,b)=>a+b,0) : null;
@@ -247,18 +251,15 @@ function openAvatarPicker() {
 
 function closeAvatarPicker() {
   document.getElementById('avatar-picker-overlay').classList.remove('active');
-  // keep body lock — profile is still open
 }
 
 function _renderBuilder() {
   document.getElementById('avatar-preview-img').src = _buildDiceBearUrl(_builderState.attrs, _builderState.seed);
 
-  // attribute tabs
   document.getElementById('builder-attr-tabs').innerHTML = Object.entries(CHAR_BUILDER).map(([key, def]) =>
     `<button class="builder-attr-tab ${key === _activeAttr ? 'active' : ''}" onclick="selectBuilderAttr('${key}')">${def.label}</button>`
   ).join('');
 
-  // options panel
   const def = CHAR_BUILDER[_activeAttr];
   const current = _builderState.attrs[_activeAttr] || '';
 
@@ -308,15 +309,13 @@ async function saveAvatar(btn) {
   if (btn) { btn.textContent = 'SAVING...'; btn.disabled = true; }
   const config = { style: 'adventurer', seed: _builderState.seed, attrs: _builderState.attrs };
 
-  // save to localStorage immediately
   localStorage.setItem(`wordleAvatar_${_pickerPlayer}`, JSON.stringify(config));
   _avatarCache[_pickerPlayer] = config;
 
-  // sync to Supabase for cross-device
   try {
-    await supabase.from('avatars').upsert(
-      { player: _pickerPlayer, config, updated_at: new Date().toISOString() },
-      { onConflict: 'player' }
+    await supabase.from('avatars_v2').upsert(
+      { competition_id: currentCompetition.id, player: _pickerPlayer, config, updated_at: new Date().toISOString() },
+      { onConflict: 'competition_id,player' }
     );
   } catch(e) {}
 
@@ -331,7 +330,8 @@ async function saveAvatar(btn) {
 function _monthStats(data, m, year) {
   const md = data.filter(e => e.month === m && e.year === year);
   if (!md.length) return null;
-  return PLAYERS.map(p => {
+  const players = getPlayers();
+  return players.map(p => {
     const pe = md.filter(e => e.player === p);
     const scores = pe.map(e => e.score === 'X' ? 7 : parseInt(e.score, 10));
     const total = scores.length ? scores.reduce((a,b)=>a+b,0) : null;
@@ -357,10 +357,10 @@ function renderHallOfFame() {
   }
 
   container.innerHTML = [...entries].reverse().map(({ m, stats }) => {
-    const winner = stats[0];
+    const winner   = stats[0];
     const runnerUp = stats[1] || null;
-    const wc = PLAYER_COLORS[winner.player] || '#f5c518';
-    const rc = runnerUp ? (PLAYER_COLORS[runnerUp.player] || '#aaa') : null;
+    const wc = getPlayerColor(winner.player);
+    const rc = runnerUp ? getPlayerColor(runnerUp.player) : null;
 
     const runnerHTML = runnerUp ? `
       <div class="hof-podium-runner">
@@ -395,7 +395,6 @@ function renderWallOfShame() {
   for (let m = 0; m < now.getMonth(); m++) {
     const stats = _monthStats(data, m, now.getFullYear());
     if (!stats || stats.length < 1) continue;
-    // last place = highest total (worst score). check if 4th ties with 5th
     const last = stats[stats.length - 1];
     const secondLast = stats.length >= 2 ? stats[stats.length - 2] : null;
     const losers = (secondLast && secondLast.total === last.total)
@@ -411,7 +410,7 @@ function renderWallOfShame() {
 
   container.innerHTML = [...entries].reverse().map(({ m, losers }) => {
     const losersHTML = losers.map(s => {
-      const c = PLAYER_COLORS[s.player] || '#e74c3c';
+      const c = getPlayerColor(s.player);
       const avId = `wos-av-${s.player}-${m}`;
       return `<div class="wos-loser">
         <div class="wos-skull">💀</div>
@@ -470,7 +469,7 @@ function throwTomato(avatarId, btn) {
   document.body.appendChild(tomato);
 
   const anim = tomato.animate([
-    { left: startX + 'px', top: startY + 'px', transform: 'translate(-50%,-50%) scale(1) rotate(0deg)',         easing: 'ease-out' },
+    { left: startX + 'px', top: startY + 'px', transform: 'translate(-50%,-50%) scale(1) rotate(0deg)',          easing: 'ease-out' },
     { left: peakX  + 'px', top: peakY  + 'px', transform: `translate(-50%,-50%) scale(1.3) rotate(${rot*.5}deg)`, easing: 'ease-in'  },
     { left: endX   + 'px', top: endY   + 'px', transform: `translate(-50%,-50%) scale(0.5) rotate(${rot}deg)` },
   ], { duration: 380 + Math.random() * 140, fill: 'forwards' });
@@ -482,7 +481,6 @@ function throwTomato(avatarId, btn) {
 }
 
 function splatAt(cx, cy, avSize, avatarEl) {
-  // shake the avatar
   avatarEl.animate([
     { transform: 'translate(-4px,3px) rotate(-3deg)' },
     { transform: 'translate(4px,-2px) rotate(2deg)'  },

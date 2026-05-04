@@ -1,6 +1,17 @@
 // --- History ---
 let pendingDeleteId = null;
 
+function renderHistoryFilters() {
+  const container = document.getElementById('history-filters');
+  const players = getPlayers();
+  container.innerHTML =
+    `<button class="filter-btn active" onclick="filterHistory('ALL', this)">ALL</button>` +
+    players.map(p =>
+      `<button class="filter-btn" onclick="filterHistory('${p}', this)">${p}</button>`
+    ).join('');
+  historyFilter = 'ALL';
+}
+
 function renderHistory() {
   const data = loadData();
   const filtered = historyFilter === 'ALL' ? data : data.filter(e => e.player === historyFilter);
@@ -38,7 +49,7 @@ function renderHistory() {
 function deleteEntry(id) {
   if (pendingDeleteId === id) {
     pendingDeleteId = null;
-    supabase.from('scores').delete().eq('id', id).then(({ error }) => {
+    supabase.from('scores_v2').delete().eq('id', id).then(({ error }) => {
       if (error) { showToast('Delete failed — are you logged in?', true); return; }
       fetchScores();
       showToast('Entry removed');
@@ -46,7 +57,6 @@ function deleteEntry(id) {
     return;
   }
 
-  // First click: show confirm state
   if (pendingDeleteId !== null) {
     const prev = document.querySelector(`[data-delete-id="${pendingDeleteId}"]`);
     if (prev) { prev.textContent = '✕'; prev.classList.remove('confirm'); }
