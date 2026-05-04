@@ -34,7 +34,7 @@
       </div>
       <div class="landing-logo-text">WORDLE DORDLE</div>
     </div>
-    <div class="landing-tagline">Family Wordle Competitions</div>
+    <div class="landing-tagline">Wordle Competitions</div>
     <button class="landing-btn landing-btn-primary" onclick="showCreateScreen()">CREATE COMPETITION</button>
     <button class="landing-btn landing-btn-secondary" onclick="showJoinScreen()">JOIN WITH CODE</button>
   </div>
@@ -96,11 +96,13 @@
       <input type="text" id="join-invite-code" class="landing-input landing-code-input"
         placeholder="ABC-DEF" maxlength="7"
         oninput="this.value=this.value.toUpperCase();previewInviteCode()">
-      <div id="join-members-preview" class="join-members-preview"></div>
-      <label class="landing-label">Your Name</label>
-      <select id="join-player-name" class="landing-input">
-        <option value="">Enter code above first...</option>
-      </select>
+      <div id="join-members-preview" class="join-members-preview" style="display:none"></div>
+      <div id="join-name-section" style="display:none">
+        <label class="landing-label">Your Name</label>
+        <select id="join-player-name" class="landing-input">
+          <option value="">Select your name...</option>
+        </select>
+      </div>
       <div class="landing-error" id="join-error"></div>
       <button class="landing-btn landing-btn-primary" id="join-submit-btn" onclick="submitJoinCompetition()">JOIN</button>
     </div>
@@ -285,7 +287,7 @@
           <ul class="rules-list">
             <li>Your score is the <strong>number of guesses used</strong> (1–6)</li>
             <li>Failed puzzle <strong>(X/6)</strong> counts as <strong>7 points</strong></li>
-            <li><strong>Lower score = better</strong> — this ain't golf, think Wordle</li>
+            <li><strong>Lower score = better</strong> — 1 guess is perfect, 6 is barely scraping by</li>
             <li>Monthly rank is decided by <strong>total points</strong>, tiebroken by avg</li>
           </ul>
         </div>

@@ -2441,9 +2441,14 @@ a.history-wordle:hover {
 
 .landing-btn-secondary:hover:not(:disabled) { border-color: var(--text2); }
 
+/* Full-width when inside a form — remove max-width cap */
+.landing-form .landing-btn { max-width: none; }
+
 /* Back button */
 .landing-back {
   align-self: flex-start;
+  background: none;
+  border: none;
   font-family: var(--mono);
   font-size: 0.7rem;
   font-weight: 700;
@@ -2625,10 +2630,15 @@ a.history-wordle:hover {
   padding: 0.65rem 0.9rem;
   background: var(--surface2);
   border-radius: 7px;
-  min-height: 2.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+.join-preview-loading {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text3);
 }
 
 .join-preview-comp {
@@ -2751,16 +2761,20 @@ a.history-wordle:hover {
   border-radius: 20px;
   color: var(--text2);
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 0.3rem 0.75rem;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
   cursor: pointer;
-  max-width: 120px;
+  max-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: border-color 0.15s, color 0.15s;
+}
+
+@media (min-width: 480px) {
+  .comp-chip { max-width: 140px; font-size: 0.6rem; padding: 0.3rem 0.75rem; }
 }
 
 .comp-chip:hover,
@@ -2771,9 +2785,9 @@ a.history-wordle:hover {
 
 .comp-panel {
   position: absolute;
-  top: 100%;
-  right: 0.75rem;
-  width: 240px;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 220px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -2781,8 +2795,10 @@ a.history-wordle:hover {
   z-index: 500;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.6rem;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  text-align: center;
 }
 
 .comp-panel-name {
@@ -2793,6 +2809,8 @@ a.history-wordle:hover {
   color: var(--text);
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
+  width: 100%;
+  text-align: center;
 }
 
 .comp-panel-label {
@@ -2806,6 +2824,7 @@ a.history-wordle:hover {
 .comp-panel-code-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -2815,7 +2834,6 @@ a.history-wordle:hover {
   font-weight: 700;
   letter-spacing: 0.2em;
   color: var(--accent);
-  flex: 1;
   user-select: all;
 }
 
@@ -2853,6 +2871,7 @@ a.history-wordle:hover {
   letter-spacing: 0.08em;
   padding: 0.45rem;
   cursor: pointer;
+  width: 100%;
   transition: color 0.15s, border-color 0.15s;
   margin-top: 0.25rem;
 }

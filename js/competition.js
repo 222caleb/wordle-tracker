@@ -136,8 +136,10 @@ function showJoinScreen() {
   document.getElementById('landing-create').style.display = 'none';
   document.getElementById('landing-join').style.display = '';
   document.getElementById('join-invite-code').value = '';
-  document.getElementById('join-player-name').innerHTML = '<option value="">Enter code above first...</option>';
+  document.getElementById('join-player-name').innerHTML = '<option value="">Select your name...</option>';
+  document.getElementById('join-members-preview').style.display = 'none';
   document.getElementById('join-members-preview').innerHTML = '';
+  document.getElementById('join-name-section').style.display = 'none';
   document.getElementById('join-error').textContent = '';
 }
 
@@ -309,14 +311,19 @@ async function previewInviteCode() {
     document.getElementById('join-invite-code').value = code + '-';
   }
 
-  const previewEl = document.getElementById('join-members-preview');
-  const sel       = document.getElementById('join-player-name');
+  const previewEl  = document.getElementById('join-members-preview');
+  const nameSection = document.getElementById('join-name-section');
+  const sel        = document.getElementById('join-player-name');
 
   if (code.replace('-','').length < 6) {
+    previewEl.style.display = 'none';
+    nameSection.style.display = 'none';
     previewEl.innerHTML = '';
-    sel.innerHTML = '<option value="">Enter code above first...</option>';
     return;
   }
+
+  previewEl.style.display = '';
+  previewEl.innerHTML = '<div class="join-preview-loading">Looking up code...</div>';
 
   const { data: comp } = await supabase
     .from('competitions')
@@ -325,8 +332,8 @@ async function previewInviteCode() {
     .single();
 
   if (!comp) {
-    previewEl.innerHTML = '<div class="join-preview-error">Code not found</div>';
-    sel.innerHTML = '<option value="">—</option>';
+    previewEl.innerHTML = '<div class="join-preview-error">Code not found — double check it</div>';
+    nameSection.style.display = 'none';
     return;
   }
 
@@ -335,8 +342,10 @@ async function previewInviteCode() {
     <div class="join-preview-comp">${_escHtml(comp.name)}</div>
     <div class="join-preview-members">${names.map(_escHtml).join(' · ')}</div>
   `;
+
   sel.innerHTML = '<option value="">Select your name...</option>' +
     names.map(n => `<option value="${_escHtml(n)}">${_escHtml(n)}</option>`).join('');
+  nameSection.style.display = '';
 }
 
 async function submitJoinCompetition() {
