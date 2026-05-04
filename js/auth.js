@@ -61,10 +61,13 @@ function checkHash() {
 }
 window.addEventListener('hashchange', checkHash);
 
-// --- Magic link auth (all users) ---
+// --- Email + password auth (all users) ---
+
+let _authMode = 'signin';
 
 function showAuthOverlay() {
-  resetAuthForm();
+  _authMode = 'signin';
+  _renderAuthForm();
   document.getElementById('auth-overlay').classList.add('active');
   document.body.style.overflow = 'hidden';
   setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
@@ -75,42 +78,83 @@ function hideAuthOverlay() {
   document.body.style.overflow = '';
 }
 
-function resetAuthForm() {
-  document.getElementById('auth-form-section').style.display = '';
-  document.getElementById('auth-sent-section').style.display = 'none';
-  const emailEl = document.getElementById('auth-email');
-  if (emailEl) emailEl.value = '';
-  const errEl = document.getElementById('auth-error');
-  if (errEl) errEl.textContent = '';
-  const btn = document.getElementById('auth-send-btn');
-  if (btn) { btn.disabled = false; btn.textContent = 'SEND LOGIN LINK'; }
+function toggleAuthMode() {
+  _authMode = _authMode === 'signin' ? 'signup' : 'signin';
+  _renderAuthForm();
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 50);
 }
 
-async function submitMagicLink() {
-  const email = document.getElementById('auth-email').value.trim();
-  const errEl = document.getElementById('auth-error');
-  if (!email) { errEl.textContent = 'Enter your email address'; return; }
+function _renderAuthForm() {
+  const isSignUp = _authMode === 'signup';
+  document.getElementById('auth-form-section').style.display = '';
+  document.getElementById('auth-sent-section').style.display = 'none';
+  document.getElementById('auth-title').textContent = isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN';
+  document.getElementById('auth-password-confirm-row').style.display = isSignUp ? '' : 'none';
+  const btn = document.getElementById('auth-submit-btn');
+  btn.textContent = isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN';
+  btn.disabled = false;
+  document.getElementById('auth-toggle-text').innerHTML = isSignUp
+    ? 'Already have an account? <button class="auth-toggle-btn" onclick="toggleAuthMode()">Sign in</button>'
+    : 'New here? <button class="auth-toggle-btn" onclick="toggleAuthMode()">Create an account</button>';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  const confirm = document.getElementById('auth-password-confirm');
+  if (confirm) confirm.value = '';
+  document.getElementById('auth-error').textContent = '';
+}
 
-  errEl.textContent = '';
-  const btn = document.getElementById('auth-send-btn');
-  btn.disabled = true;
-  btn.textContent = 'SENDING...';
+async function submitAuth() {
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errEl    = document.getElementById('auth-error');
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.origin + window.location.pathname }
-  });
+  if (!email)    { errEl.textContent = 'Enter your email address'; return; }
+  if (!password) { errEl.textContent = 'Enter your password'; return; }
 
-  if (error) {
-    btn.disabled = false;
-    btn.textContent = 'SEND LOGIN LINK';
-    errEl.textContent = error.message;
-    return;
+  const btn = document.getElementById('auth-submit-btn');
+
+  if (_authMode === 'signup') {
+    const confirm = document.getElementById('auth-password-confirm').value;
+    if (password !== confirm)  { errEl.textContent = 'Passwords don\'t match'; return; }
+    if (password.length < 6)   { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+    errEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'CREATING...';
+
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+
+    if (error) {
+      errEl.textContent = error.message;
+      btn.disabled = false;
+      btn.textContent = 'CREATE ACCOUNT';
+      return;
+    }
+
+    document.getElementById('auth-form-section').style.display = 'none';
+    document.getElementById('auth-sent-section').style.display = '';
+    document.getElementById('auth-sent-email').textContent = email;
+
+  } else {
+    errEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'SIGNING IN...';
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errEl.textContent = error.message === 'Invalid login credentials'
+        ? 'Incorrect email or password'
+        : error.message;
+      btn.disabled = false;
+      btn.textContent = 'SIGN IN';
+      return;
+    }
+    // onAuthStateChange handles the rest
   }
-
-  document.getElementById('auth-form-section').style.display = 'none';
-  document.getElementById('auth-sent-section').style.display = '';
-  document.getElementById('auth-sent-email').textContent = email;
 }
 
 // --- Auth state listener ---

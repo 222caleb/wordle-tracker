@@ -2926,6 +2926,34 @@ a.history-wordle:hover {
   color: var(--text);
 }
 
+.auth-title {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.auth-toggle-text {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 0.2rem;
+}
+
+.auth-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .auth-subtitle {
   font-family: var(--sans);
   font-size: 0.9rem;
@@ -2944,6 +2972,7 @@ a.history-wordle:hover {
 /* auth-form-section uses landing-input / landing-btn / landing-error already */
 #auth-form-section {
   width: 100%;
+  max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2951,9 +2980,12 @@ a.history-wordle:hover {
 }
 
 #auth-form-section .landing-btn {
-  max-width: none;
   width: 100%;
-  max-width: 320px;
+  max-width: none;
+}
+
+#auth-password-confirm-row {
+  width: 100%;
 }
 
 /* Sent confirmation section */

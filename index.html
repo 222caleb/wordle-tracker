@@ -34,24 +34,35 @@
     </div>
 
     <div id="auth-form-section">
-      <div class="auth-subtitle">Enter your email to receive a magic login link.</div>
+      <div class="auth-title" id="auth-title">SIGN IN</div>
       <input type="email" id="auth-email" class="landing-input auth-email-input"
         placeholder="your@email.com"
-        onkeydown="if(event.key==='Enter')submitMagicLink()">
+        onkeydown="if(event.key==='Enter')submitAuth()">
+      <input type="password" id="auth-password" class="landing-input auth-email-input"
+        placeholder="password"
+        onkeydown="if(event.key==='Enter')submitAuth()">
+      <div id="auth-password-confirm-row" style="display:none; width:100%">
+        <input type="password" id="auth-password-confirm" class="landing-input auth-email-input"
+          placeholder="confirm password"
+          onkeydown="if(event.key==='Enter')submitAuth()">
+      </div>
       <div class="landing-error" id="auth-error"></div>
-      <button class="landing-btn landing-btn-primary" id="auth-send-btn" onclick="submitMagicLink()">
-        SEND LOGIN LINK
+      <button class="landing-btn landing-btn-primary" id="auth-submit-btn" onclick="submitAuth()">
+        SIGN IN
       </button>
+      <div class="auth-toggle-text" id="auth-toggle-text">
+        New here? <button class="auth-toggle-btn" onclick="toggleAuthMode()">Create an account</button>
+      </div>
     </div>
 
     <div id="auth-sent-section" style="display:none">
       <div class="auth-sent-icon">📬</div>
       <div class="auth-sent-title">CHECK YOUR EMAIL</div>
       <div class="auth-sent-text">
-        We sent a magic link to<br><strong id="auth-sent-email"></strong>
+        We sent a confirmation link to<br><strong id="auth-sent-email"></strong>
       </div>
-      <div class="auth-sent-sub">Click the link in the email to sign in — no password needed.</div>
-      <button class="auth-resend-btn" onclick="resetAuthForm()">← Use a different email</button>
+      <div class="auth-sent-sub">Click the link to activate your account, then come back and sign in.</div>
+      <button class="auth-resend-btn" onclick="showAuthOverlay()">← Back to sign in</button>
     </div>
   </div>
 </div>
