@@ -252,13 +252,51 @@ async function submitCreateCompetition() {
     currentPlayer = validMembers[0].name.trim();
     localStorage.setItem('wordlePlayer', currentPlayer);
 
-    hideLanding();
-    initAppUI();
+    showInviteScreen();
   } catch(e) {
     errEl.textContent = e.message || 'Failed to create — try again';
     btn.disabled = false;
     btn.textContent = 'CREATE COMPETITION';
   }
+}
+
+// --- Invite Code Screen (shown after create) ---
+
+function showInviteScreen() {
+  document.getElementById('landing-home').style.display   = 'none';
+  document.getElementById('landing-create').style.display = 'none';
+  document.getElementById('landing-join').style.display   = 'none';
+  document.getElementById('landing-invite').style.display = '';
+
+  const code = currentCompetition.invite_code;
+  document.getElementById('invite-code-display').textContent = code;
+  document.getElementById('invite-comp-name').textContent = currentCompetition.name;
+  document.getElementById('invite-members-list').textContent =
+    currentCompetition.members.map(m => m.display_name).join(', ');
+  document.getElementById('invite-copy-btn').textContent = 'COPY CODE';
+}
+
+async function copyInviteCode() {
+  const code = currentCompetition.invite_code;
+  try {
+    await navigator.clipboard.writeText(code);
+    const btn = document.getElementById('invite-copy-btn');
+    btn.textContent = 'COPIED! ✓';
+    setTimeout(() => { btn.textContent = 'COPY CODE'; }, 2000);
+  } catch(e) {}
+}
+
+function enterCompetition() {
+  hideLanding();
+  initAppUI();
+}
+
+// --- Switch / Leave Competition ---
+
+function switchCompetition() {
+  localStorage.removeItem('wordleCompetitionId');
+  localStorage.removeItem('wordlePlayer');
+  location.reload();
 }
 
 // --- Join Screen ---

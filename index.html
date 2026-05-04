@@ -65,6 +65,28 @@
     </div>
   </div>
 
+  <!-- Invite code screen (shown after creating a competition) -->
+  <div id="landing-invite" class="landing-screen" style="display:none">
+    <div class="invite-screen-header">
+      <div class="invite-check">✓</div>
+      <div class="landing-title" id="invite-comp-name"></div>
+      <div class="invite-subtitle">Competition created! Share this code with your players.</div>
+    </div>
+    <div class="invite-code-block">
+      <div class="invite-code-label">INVITE CODE</div>
+      <div class="invite-code-display" id="invite-code-display"></div>
+      <button class="invite-copy-btn" id="invite-copy-btn" onclick="copyInviteCode()">COPY CODE</button>
+    </div>
+    <div class="invite-members-wrap">
+      <div class="landing-label">PLAYERS</div>
+      <div class="invite-members-list" id="invite-members-list"></div>
+    </div>
+    <div class="invite-instructions">
+      Everyone else opens the app and taps <strong>JOIN WITH CODE</strong>, enters this code, and picks their name.
+    </div>
+    <button class="landing-btn landing-btn-primary" onclick="enterCompetition()">ENTER COMPETITION →</button>
+  </div>
+
   <!-- Join screen -->
   <div id="landing-join" class="landing-screen" style="display:none">
     <button class="landing-back" onclick="showLandingHome()">← BACK</button>
@@ -100,7 +122,19 @@
   <div class="header-right">
     <span id="admin-badge" class="admin-badge">ADMIN</span>
     <button id="logout-btn" class="logout-btn" onclick="adminLogout()">LOGOUT</button>
+    <button id="comp-chip" class="comp-chip" onclick="toggleCompPanel()" style="display:none"></button>
     <span id="header-date"></span>
+    <!-- Competition panel anchored inside header-right -->
+    <div id="comp-panel" class="comp-panel" style="display:none">
+      <div class="comp-panel-name" id="comp-panel-name"></div>
+      <div class="comp-panel-code-row">
+        <div class="comp-panel-code" id="comp-panel-code"></div>
+        <button class="comp-panel-copy-btn" id="comp-panel-copy-btn" onclick="copyCompCode()">COPY</button>
+      </div>
+      <div class="comp-panel-label">YOUR NAME</div>
+      <div class="comp-panel-player" id="comp-panel-player"></div>
+      <button class="comp-panel-switch-btn" onclick="switchCompetition()">SWITCH COMPETITION</button>
+    </div>
   </div>
 </header>
 

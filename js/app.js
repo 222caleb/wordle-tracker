@@ -77,6 +77,7 @@ function renderAll() {
 // --- App init (called from competition.js after competition loads) ---
 function initAppUI() {
   setHeaderDate();
+  renderCompChip();
   populatePlayerSelect();
   renderHistoryFilters();
   renderAll();
@@ -339,6 +340,46 @@ function closeCelebration() {
   document.body.style.overflow = '';
   if (_congratsChannel) { supabase.removeChannel(_congratsChannel); _congratsChannel = null; }
 }
+
+// --- Competition chip in header ---
+function renderCompChip() {
+  if (!currentCompetition) return;
+  const chip = document.getElementById('comp-chip');
+  chip.textContent = currentCompetition.name;
+  chip.style.display = '';
+
+  document.getElementById('comp-panel-name').textContent = currentCompetition.name;
+  document.getElementById('comp-panel-code').textContent = currentCompetition.invite_code;
+  document.getElementById('comp-panel-player').textContent = currentPlayer || '—';
+}
+
+function toggleCompPanel() {
+  const panel = document.getElementById('comp-panel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : '';
+  document.getElementById('comp-chip').classList.toggle('active', !isOpen);
+}
+
+async function copyCompCode() {
+  const code = currentCompetition.invite_code;
+  try {
+    await navigator.clipboard.writeText(code);
+    const btn = document.getElementById('comp-panel-copy-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(() => { btn.textContent = 'COPY'; }, 2000);
+  } catch(e) {}
+}
+
+// Close comp panel when clicking outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('comp-panel');
+  const chip  = document.getElementById('comp-chip');
+  if (panel && panel.style.display !== 'none' &&
+      !panel.contains(e.target) && e.target !== chip) {
+    panel.style.display = 'none';
+    chip.classList.remove('active');
+  }
+});
 
 // Entry point — competition.js defines initApp()
 initApp();

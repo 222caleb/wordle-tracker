@@ -81,6 +81,7 @@ header {
   line-height: 1.5;
   white-space: pre;
   display: flex;
+  position: relative;
   align-items: center;
   gap: 12px;
 }
@@ -2649,3 +2650,211 @@ a.history-wordle:hover {
   font-size: 0.72rem;
   color: #e74c3c;
 }
+
+/* ===== INVITE CODE SCREEN ===== */
+
+.invite-screen-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.invite-check {
+  font-size: 2rem;
+  color: var(--green);
+  margin-bottom: 0.2rem;
+}
+
+.invite-subtitle {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  color: var(--text2);
+  text-align: center;
+}
+
+.invite-code-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.invite-code-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+}
+
+.invite-code-display {
+  font-family: var(--mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  user-select: all;
+}
+
+.invite-copy-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.invite-copy-btn:hover { opacity: 0.85; }
+
+.invite-members-wrap {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.invite-members-list {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--text2);
+}
+
+.invite-instructions {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--text3);
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* ===== COMPETITION CHIP + PANEL ===== */
+
+.comp-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.comp-chip:hover,
+.comp-chip.active {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.comp-panel {
+  position: absolute;
+  top: 100%;
+  right: 0.75rem;
+  width: 240px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.comp-panel-name {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.comp-panel-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+}
+
+.comp-panel-code-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.comp-panel-code {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  flex: 1;
+  user-select: all;
+}
+
+.comp-panel-copy-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.comp-panel-copy-btn:hover { color: var(--text); border-color: var(--text2); }
+
+.comp-panel-player {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.comp-panel-switch-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.45rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-top: 0.25rem;
+}
+
+.comp-panel-switch-btn:hover { color: #e74c3c; border-color: #e74c3c; }
