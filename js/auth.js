@@ -1,7 +1,10 @@
-// --- Auth ---
+const ADMIN_EMAILS = ['maxaustin1244@gmail.com'];
+
+// --- Admin state ---
 async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) setAdminState(true);
+  const email = session?.user?.email;
+  setAdminState(email && ADMIN_EMAILS.includes(email));
 }
 
 function setAdminState(val) {
@@ -11,10 +14,11 @@ function setAdminState(val) {
   renderHistory();
 }
 
+// --- Admin modal (email + password, accessed via #admin hash) ---
 async function adminLogin() {
-  const email = document.getElementById('admin-email').value.trim();
+  const email    = document.getElementById('admin-email').value.trim();
   const password = document.getElementById('admin-password').value;
-  const errEl = document.getElementById('login-error');
+  const errEl    = document.getElementById('login-error');
   errEl.textContent = '';
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) { errEl.textContent = 'Invalid email or password.'; return; }
@@ -56,3 +60,83 @@ function checkHash() {
   }
 }
 window.addEventListener('hashchange', checkHash);
+
+// --- Magic link auth (all users) ---
+
+function showAuthOverlay() {
+  resetAuthForm();
+  document.getElementById('auth-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
+}
+
+function hideAuthOverlay() {
+  document.getElementById('auth-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function resetAuthForm() {
+  document.getElementById('auth-form-section').style.display = '';
+  document.getElementById('auth-sent-section').style.display = 'none';
+  const emailEl = document.getElementById('auth-email');
+  if (emailEl) emailEl.value = '';
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.textContent = '';
+  const btn = document.getElementById('auth-send-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'SEND LOGIN LINK'; }
+}
+
+async function submitMagicLink() {
+  const email = document.getElementById('auth-email').value.trim();
+  const errEl = document.getElementById('auth-error');
+  if (!email) { errEl.textContent = 'Enter your email address'; return; }
+
+  errEl.textContent = '';
+  const btn = document.getElementById('auth-send-btn');
+  btn.disabled = true;
+  btn.textContent = 'SENDING...';
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.origin + window.location.pathname }
+  });
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'SEND LOGIN LINK';
+    errEl.textContent = error.message;
+    return;
+  }
+
+  document.getElementById('auth-form-section').style.display = 'none';
+  document.getElementById('auth-sent-section').style.display = '';
+  document.getElementById('auth-sent-email').textContent = email;
+}
+
+// --- Auth state listener ---
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN') {
+    hideAuthOverlay();
+    const email = session?.user?.email;
+    setAdminState(email && ADMIN_EMAILS.includes(email));
+
+    // Only boot the app if competition isn't loaded yet
+    if (!currentCompetition) {
+      loadCompetition().then(comp => {
+        if (comp) initAppUI();
+        else showLanding();
+      });
+    }
+  } else if (event === 'SIGNED_OUT') {
+    currentCompetition = null;
+    currentPlayer      = null;
+    allScores          = [];
+    _celebrationChecked = false;
+    if (scoresChannel) {
+      supabase.removeChannel(scoresChannel);
+      scoresChannel = null;
+    }
+    setAdminState(false);
+    showAuthOverlay();
+  }
+});

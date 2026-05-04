@@ -19,6 +19,43 @@
 </head>
 <body>
 
+<!-- Auth overlay — shown when user has no active session -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-screen">
+    <div class="auth-logo">
+      <div class="logo-tiles">
+        <div class="logo-tile tile-x"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-y"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-g"></div>
+      </div>
+      <div class="auth-logo-text">WORDLE DORDLE</div>
+    </div>
+
+    <div id="auth-form-section">
+      <div class="auth-subtitle">Enter your email to receive a magic login link.</div>
+      <input type="email" id="auth-email" class="landing-input auth-email-input"
+        placeholder="your@email.com"
+        onkeydown="if(event.key==='Enter')submitMagicLink()">
+      <div class="landing-error" id="auth-error"></div>
+      <button class="landing-btn landing-btn-primary" id="auth-send-btn" onclick="submitMagicLink()">
+        SEND LOGIN LINK
+      </button>
+    </div>
+
+    <div id="auth-sent-section" style="display:none">
+      <div class="auth-sent-icon">📬</div>
+      <div class="auth-sent-title">CHECK YOUR EMAIL</div>
+      <div class="auth-sent-text">
+        We sent a magic link to<br><strong id="auth-sent-email"></strong>
+      </div>
+      <div class="auth-sent-sub">Click the link in the email to sign in — no password needed.</div>
+      <button class="auth-resend-btn" onclick="resetAuthForm()">← Use a different email</button>
+    </div>
+  </div>
+</div>
+
 <!-- Landing overlay — shown when no competition is stored in localStorage -->
 <div id="landing-overlay" class="landing-overlay">
 

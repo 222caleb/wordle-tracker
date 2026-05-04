@@ -2877,3 +2877,141 @@ a.history-wordle:hover {
 }
 
 .comp-panel-switch-btn:hover { color: #e74c3c; border-color: #e74c3c; }
+
+/* ===== AUTH OVERLAY ===== */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: var(--bg);
+  display: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.auth-overlay.active { display: flex; }
+
+.auth-screen {
+  width: 100%;
+  max-width: 400px;
+  min-height: 100dvh;
+  padding: 3.5rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.auth-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.auth-logo .logo-tiles {
+  display: flex;
+  gap: 4px;
+}
+
+.auth-logo-text {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+}
+
+.auth-subtitle {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 300px;
+  margin-bottom: 0.4rem;
+}
+
+.auth-email-input {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* auth-form-section uses landing-input / landing-btn / landing-error already */
+#auth-form-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+#auth-form-section .landing-btn {
+  max-width: none;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Sent confirmation section */
+#auth-sent-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.auth-sent-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.auth-sent-title {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+.auth-sent-text {
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.auth-sent-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.auth-sent-sub {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: var(--text3);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.auth-resend-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  transition: color 0.15s;
+}
+
+.auth-resend-btn:hover { color: var(--text2); }

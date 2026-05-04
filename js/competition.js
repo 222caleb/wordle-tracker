@@ -12,9 +12,45 @@ function generateInviteCode() {
 }
 
 async function loadCompetition() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // Stage 2: try finding competition via user_id in competition_members
+  if (session?.user?.id) {
+    const { data: memberRow } = await supabase
+      .from('competition_members')
+      .select('display_name, competition_id')
+      .eq('user_id', session.user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (memberRow) {
+      return await _loadCompetitionById(memberRow.competition_id, memberRow.display_name);
+    }
+  }
+
+  // Stage 1 fallback: localStorage
   const id = localStorage.getItem('wordleCompetitionId');
   if (!id) return null;
 
+  const comp = await _loadCompetitionById(id, localStorage.getItem('wordlePlayer'));
+  if (!comp) return null;
+
+  // Auto-claim slot if signed in but slot unclaimed
+  if (session?.user?.id && currentPlayer) {
+    const member = currentCompetition.members.find(
+      m => m.display_name === currentPlayer && !m.user_id
+    );
+    if (member) {
+      await supabase.from('competition_members')
+        .update({ user_id: session.user.id })
+        .eq('id', member.id);
+    }
+  }
+
+  return comp;
+}
+
+async function _loadCompetitionById(id, savedPlayer) {
   const { data, error } = await supabase
     .from('competitions')
     .select('*, competition_members(*)')
@@ -35,9 +71,10 @@ async function loadCompetition() {
     members: data.competition_members || [],
   };
 
-  const savedPlayer = localStorage.getItem('wordlePlayer');
   if (savedPlayer && currentCompetition.members.some(m => m.display_name === savedPlayer)) {
     currentPlayer = savedPlayer;
+    localStorage.setItem('wordleCompetitionId', id);
+    localStorage.setItem('wordlePlayer', currentPlayer);
   }
 
   return currentCompetition;
@@ -101,6 +138,14 @@ async function joinCompetition(inviteCode, playerName) {
   localStorage.setItem('wordleCompetitionId', comp.id);
   currentPlayer = member.display_name;
   localStorage.setItem('wordlePlayer', currentPlayer);
+
+  // Claim this member slot for the current user
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user?.id && !member.user_id) {
+    await supabase.from('competition_members')
+      .update({ user_id: session.user.id })
+      .eq('id', member.id);
+  }
 
   return currentCompetition;
 }
@@ -250,9 +295,19 @@ async function submitCreateCompetition() {
     };
 
     localStorage.setItem('wordleCompetitionId', full.id);
-    // First member is this device's player
     currentPlayer = validMembers[0].name.trim();
     localStorage.setItem('wordlePlayer', currentPlayer);
+
+    // Claim the creator's member slot
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      const creatorMember = currentCompetition.members.find(m => m.display_name === currentPlayer);
+      if (creatorMember && !creatorMember.user_id) {
+        await supabase.from('competition_members')
+          .update({ user_id: session.user.id })
+          .eq('id', creatorMember.id);
+      }
+    }
 
     showInviteScreen();
   } catch(e) {
@@ -375,6 +430,13 @@ async function submitJoinCompetition() {
 // --- App startup gate ---
 
 async function initApp() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    showAuthOverlay();
+    return;
+  }
+
   const comp = await loadCompetition();
   if (comp) {
     initAppUI();
