@@ -437,6 +437,9 @@ async function initApp() {
     return;
   }
 
+  const email = session?.user?.email;
+  setAdminState(email && ADMIN_EMAILS.includes(email));
+
   const comp = await loadCompetition();
   if (comp) {
     initAppUI();
