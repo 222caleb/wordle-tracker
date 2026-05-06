@@ -176,14 +176,7 @@
     <span id="header-date"></span>
     <!-- Competition panel anchored inside header-right -->
     <div id="comp-panel" class="comp-panel" style="display:none">
-      <div class="comp-panel-name" id="comp-panel-name"></div>
-      <div class="comp-panel-code-row">
-        <div class="comp-panel-code" id="comp-panel-code"></div>
-        <button class="comp-panel-copy-btn" id="comp-panel-copy-btn" onclick="copyCompCode()">COPY</button>
-      </div>
-      <div class="comp-panel-label">YOUR NAME</div>
-      <div class="comp-panel-player" id="comp-panel-player"></div>
-      <button class="comp-panel-switch-btn" onclick="switchCompetition()">SWITCH COMPETITION</button>
+      <div id="comp-panel-content"></div>
     </div>
   </div>
 </header>
@@ -428,6 +421,54 @@
   </div>
 </div>
 
+<!-- Competition Settings Modal -->
+<div id="settings-overlay" class="settings-overlay">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <div class="settings-title">COMPETITION SETTINGS</div>
+      <button class="settings-close-btn" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">COMPETITION NAME</div>
+      <div class="settings-row">
+        <input type="text" id="settings-name" class="settings-input" maxlength="40">
+        <button class="settings-save-btn" id="settings-name-btn" onclick="saveCompName()">SAVE</button>
+      </div>
+      <div class="settings-error" id="settings-name-error"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">GRAND PRIZE</div>
+      <div class="settings-row">
+        <span class="settings-dollar">$</span>
+        <input type="number" id="settings-prize" class="settings-input settings-prize-input" min="0">
+        <button class="settings-save-btn" id="settings-prize-btn" onclick="saveCompPrize()">SAVE</button>
+      </div>
+      <div class="settings-error" id="settings-prize-error"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">INVITE CODE</div>
+      <div class="settings-row">
+        <div class="settings-invite-code" id="settings-invite-code"></div>
+        <button class="settings-save-btn" id="settings-regen-btn" onclick="regenerateInviteCode()">REGENERATE</button>
+      </div>
+      <div class="settings-msg" id="settings-code-msg"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">MEMBERS</div>
+      <div id="settings-members-list"></div>
+    </div>
+
+    <div class="settings-section settings-danger-section">
+      <div class="settings-section-title">DANGER ZONE</div>
+      <button class="settings-danger-btn" id="settings-archive-btn" onclick="toggleArchive()">ARCHIVE SEASON</button>
+    </div>
+  </div>
+</div>
+
 <div id="celebration-overlay" class="celebration-overlay">
   <div id="cel-confetti" class="cel-confetti"></div>
   <div class="cel-content">
@@ -452,6 +493,7 @@
 <script src="js/history.js"></script>
 <script src="js/submit.js"></script>
 <script src="js/profile.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {

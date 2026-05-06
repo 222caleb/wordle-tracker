@@ -68,6 +68,8 @@ async function _loadCompetitionById(id, savedPlayer) {
     invite_code: data.invite_code,
     prize_amount: data.prize_amount,
     season_year: data.season_year,
+    is_archived: data.is_archived || false,
+    creator_user_id: data.creator_user_id || null,
     members: data.competition_members || [],
   };
 
@@ -83,9 +85,11 @@ async function _loadCompetitionById(id, savedPlayer) {
 async function _createCompetitionInDb(name, members, prizeAmount, seasonYear) {
   const invite_code = generateInviteCode();
 
+  const { data: { session } } = await supabase.auth.getSession();
+
   const { data: comp, error: compErr } = await supabase
     .from('competitions')
-    .insert([{ name, invite_code, prize_amount: prizeAmount || 0, season_year: seasonYear || new Date().getFullYear() }])
+    .insert([{ name, invite_code, prize_amount: prizeAmount || 0, season_year: seasonYear || new Date().getFullYear(), creator_user_id: session?.user?.id || null }])
     .select()
     .single();
 
@@ -348,12 +352,50 @@ function enterCompetition() {
   initAppUI();
 }
 
-// --- Switch / Leave Competition ---
+// --- Multi-competition switcher ---
 
-function switchCompetition() {
-  localStorage.removeItem('wordleCompetitionId');
-  localStorage.removeItem('wordlePlayer');
-  location.reload();
+let userCompetitions = [];
+
+async function loadAllCompetitions() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return [];
+
+  const { data } = await supabase
+    .from('competition_members')
+    .select('display_name, competition_id, competitions(id, name, invite_code, prize_amount, season_year)')
+    .eq('user_id', session.user.id);
+
+  userCompetitions = (data || []).map(row => ({
+    id: row.competition_id,
+    name: row.competitions?.name || '',
+    invite_code: row.competitions?.invite_code || '',
+    prize_amount: row.competitions?.prize_amount || 0,
+    season_year: row.competitions?.season_year || new Date().getFullYear(),
+    myDisplayName: row.display_name,
+  }));
+
+  return userCompetitions;
+}
+
+async function switchToCompetition(id) {
+  if (id === currentCompetition?.id) { toggleCompPanel(); return; }
+
+  const comp = userCompetitions.find(c => c.id === id);
+  if (!comp) return;
+
+  localStorage.setItem('wordleCompetitionId', id);
+  localStorage.setItem('wordlePlayer', comp.myDisplayName);
+
+  await _loadCompetitionById(id, comp.myDisplayName);
+
+  allScores = [];
+  if (scoresChannel) {
+    supabase.removeChannel(scoresChannel);
+    scoresChannel = null;
+  }
+
+  toggleCompPanel();
+  initAppUI();
 }
 
 // --- Join Screen ---

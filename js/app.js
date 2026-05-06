@@ -347,17 +347,60 @@ function renderCompChip() {
   const chip = document.getElementById('comp-chip');
   chip.textContent = currentCompetition.name;
   chip.style.display = '';
-
-  document.getElementById('comp-panel-name').textContent = currentCompetition.name;
-  document.getElementById('comp-panel-code').textContent = currentCompetition.invite_code;
-  document.getElementById('comp-panel-player').textContent = currentPlayer || '—';
 }
 
-function toggleCompPanel() {
+async function toggleCompPanel() {
   const panel = document.getElementById('comp-panel');
   const isOpen = panel.style.display !== 'none';
   panel.style.display = isOpen ? 'none' : '';
   document.getElementById('comp-chip').classList.toggle('active', !isOpen);
+  if (!isOpen) await renderCompPanel();
+}
+
+async function renderCompPanel() {
+  const el = document.getElementById('comp-panel-content');
+  el.innerHTML = '<div class="comp-panel-loading">Loading...</div>';
+
+  await loadAllCompetitions();
+
+  const items = userCompetitions.map(c => {
+    const isActive = c.id === currentCompetition?.id;
+    return `<div class="comp-panel-item${isActive ? ' active' : ''}"
+      ${!isActive ? `onclick="switchToCompetition('${c.id}')"` : ''}>
+      <div class="comp-panel-item-info">
+        <div class="comp-panel-item-name">${_escHtml(c.name)}</div>
+        <div class="comp-panel-item-sub">${_escHtml(c.myDisplayName)} · ${c.season_year}</div>
+      </div>
+      ${isActive ? '<div class="comp-panel-active-dot"></div>' : ''}
+    </div>`;
+  }).join('');
+
+  const owner = await _checkOwner();
+
+  const inviteSection = currentCompetition ? `
+    <div class="comp-panel-divider"></div>
+    <div class="comp-panel-label">INVITE CODE</div>
+    <div class="comp-panel-code-row">
+      <div class="comp-panel-code" id="comp-panel-code">${currentCompetition.invite_code}</div>
+      <button class="comp-panel-copy-btn" id="comp-panel-copy-btn" onclick="copyCompCode()">COPY</button>
+    </div>
+  ` : '';
+
+  const settingsBtn = owner ? `
+    <button class="comp-panel-action-btn" onclick="toggleCompPanel();openSettings()">SETTINGS</button>
+  ` : '';
+
+  el.innerHTML = `
+    <div class="comp-panel-section-label">MY COMPETITIONS</div>
+    ${items || '<div class="comp-panel-empty">No competitions found</div>'}
+    ${inviteSection}
+    <div class="comp-panel-divider"></div>
+    <div class="comp-panel-actions">
+      <button class="comp-panel-action-btn" onclick="toggleCompPanel();showLanding();showJoinScreen()">JOIN</button>
+      <button class="comp-panel-action-btn" onclick="toggleCompPanel();showLanding();showCreateScreen()">CREATE</button>
+      ${settingsBtn}
+    </div>
+  `;
 }
 
 async function copyCompCode() {
