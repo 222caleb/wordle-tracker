@@ -20,6 +20,33 @@
 <body>
 
 <!-- Auth overlay — shown when user has no active session -->
+<!-- Home screen -->
+<div id="home-overlay" class="home-overlay">
+  <div class="home-screen">
+    <div class="home-logo">
+      <div class="logo-tiles">
+        <div class="logo-tile tile-x"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-y"></div>
+        <div class="logo-tile tile-g"></div>
+        <div class="logo-tile tile-g"></div>
+      </div>
+      <div class="home-logo-text">WORDLE DORDLE</div>
+    </div>
+    <div class="home-meta">
+      <div class="home-comp-name" id="home-comp-name"></div>
+      <div class="home-player-name" id="home-player-name"></div>
+    </div>
+    <button class="home-play-btn" onclick="hideHome()">▶ PLAY</button>
+    <div class="home-actions">
+      <button class="home-action-btn" onclick="hideHome(); openProfile(currentPlayer)">PROFILE</button>
+      <button class="home-action-btn" id="home-settings-btn" style="display:none" onclick="hideHome(); openSettings()">SETTINGS</button>
+      <button class="home-action-btn" onclick="hideHome(); switchTab('rules', document.querySelector('.tab[onclick*=rules]'))">HOW TO PLAY</button>
+    </div>
+    <button class="home-signout-btn" onclick="userSignOut()">SIGN OUT</button>
+  </div>
+</div>
+
 <div id="auth-overlay" class="auth-overlay">
   <div class="auth-screen">
     <div class="auth-logo">

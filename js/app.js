@@ -74,6 +74,29 @@ function renderAll() {
   renderTodayScores();
 }
 
+// --- Home screen ---
+async function showHome() {
+  document.getElementById('home-comp-name').textContent =
+    currentCompetition ? `${currentCompetition.name.toUpperCase()} · ${currentCompetition.season_year}` : '';
+  document.getElementById('home-player-name').textContent =
+    currentPlayer ? currentPlayer.toUpperCase() : '';
+
+  const owner = await _checkOwner();
+  document.getElementById('home-settings-btn').style.display = owner ? '' : 'none';
+
+  document.getElementById('home-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function hideHome() {
+  document.getElementById('home-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function userSignOut() {
+  await supabase.auth.signOut();
+}
+
 // --- App init (called from competition.js after competition loads) ---
 function initAppUI() {
   setHeaderDate();
@@ -112,6 +135,8 @@ function initAppUI() {
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) fetchScores();
   });
+
+  showHome();
 }
 
 // --- Hero terminal ---

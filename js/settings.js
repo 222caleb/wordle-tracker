@@ -45,7 +45,7 @@ function _renderSettingsMembers() {
     <div class="settings-member-row" id="settings-member-${m.id}">
       <div class="settings-member-dot" style="background:${m.color || '#888'}"></div>
       <div class="settings-member-name">${_escHtml(m.display_name)}</div>
-      <div class="settings-member-status">${m.user_id ? '✓ joined' : 'pending'}</div>
+      <div class="settings-member-status">${m.user_id ? '✓ joined' : 'not signed up'}</div>
       <button class="settings-member-remove" onclick="removeMember('${m.id}','${_escHtml(m.display_name)}')" title="Remove">✕</button>
     </div>
   `).join('');

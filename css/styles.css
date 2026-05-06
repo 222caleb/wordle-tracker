@@ -3142,6 +3142,136 @@ a.history-wordle:hover {
 
 .auth-resend-btn:hover { color: var(--text2); }
 
+/* ===== HOME SCREEN ===== */
+
+.home-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3500;
+  background: var(--bg);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-overlay.active { display: flex; }
+
+.home-screen {
+  width: 100%;
+  max-width: 400px;
+  min-height: 100dvh;
+  padding: 3.5rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.home-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.home-logo .logo-tiles { display: flex; gap: 4px; }
+
+.home-logo-text {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text);
+}
+
+.home-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.home-comp-name {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text2);
+}
+
+.home-player-name {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.home-play-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 1.1rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+
+.home-play-btn:hover { opacity: 0.9; }
+.home-play-btn:active { transform: scale(0.97); }
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.home-action-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.home-action-btn:hover { color: var(--text); border-color: var(--text2); }
+
+.home-signout-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-top: auto;
+  transition: color 0.15s;
+}
+
+.home-signout-btn:hover { color: #e74c3c; }
+
 /* ===== SETTINGS MODAL ===== */
 
 .settings-overlay {
@@ -3158,7 +3288,7 @@ a.history-wordle:hover {
 .settings-overlay.active { display: flex; }
 
 .settings-modal {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   width: 100%;
