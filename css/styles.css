@@ -281,18 +281,26 @@ header {
   font-size: 14px;
 }
 
-.fives-badge {
+.score-badge {
   font-size: 11px;
   font-family: var(--mono);
   font-weight: 700;
-  background: #3a2e00;
-  color: #f5c518;
-  border: 1px solid #7a6200;
   border-radius: 10px;
   padding: 1px 7px;
   white-space: nowrap;
   flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
 }
+.score-badge:hover { opacity: 0.75; }
+.score-badge-1 { background: #0d2b1a; color: #538d4e; border: 1px solid #538d4e; }
+.score-badge-2 { background: #0d2420; color: #4ecdc4; border: 1px solid #4ecdc4; }
+.score-badge-3 { background: #0d1f2b; color: #5b8dee; border: 1px solid #5b8dee; }
+.score-badge-4 { background: #2b2b0d; color: #c8b400; border: 1px solid #c8b400; }
+.score-badge-5 { background: #2b1a0d; color: #e67e22; border: 1px solid #e67e22; }
+.score-badge-6 { background: #2b0d0d; color: #e74c3c; border: 1px solid #e74c3c; }
+.score-badge-X { background: #1a0d1a; color: #9b59b6; border: 1px solid #9b59b6; }
 
 .stat-col {
   text-align: right;

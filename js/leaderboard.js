@@ -1,3 +1,20 @@
+// --- Score badges ---
+const SCORE_BADGES = {
+  '1': { emoji: '🎯', desc: n => `${n}× score of 1 — hole-in-one machine` },
+  '2': { emoji: '⚡', desc: n => `${n}× score of 2 — consistently electric` },
+  '3': { emoji: '✨', desc: n => `${n}× score of 3 — sharp solver` },
+  '4': { emoji: '🎲', desc: n => `${n}× score of 4 — steady` },
+  '5': { emoji: '😬', desc: n => `${n}× score of 5 — the grind is real` },
+  '6': { emoji: '😅', desc: n => `${n}× score of 6 — living on the edge` },
+  'X': { emoji: '💀', desc: n => `${n}× failed — rough month` },
+};
+
+function showBadgeInfo(event, score, count) {
+  event.stopPropagation();
+  const b = SCORE_BADGES[score];
+  showToast(`${b.emoji} ${b.desc(count)}`);
+}
+
 // --- Monthly points ---
 function computeMonthlyPoints(upToMonth) {
   const data = loadData();
@@ -186,8 +203,13 @@ function renderLeaderboard(shouldAnimate = false) {
     }
     card.addEventListener('click', () => toggleDist(card));
 
-    const fiveCount = s.dist['5'] || 0;
-    const fivesBadge = fiveCount >= 5 ? `<span class="fives-badge" title="${fiveCount} fives this month">5️⃣ ×${fiveCount}</span>` : '';
+    const badgesHTML = ['1','2','3','4','5','6','X']
+      .filter(v => (s.dist[v] || 0) >= 12)
+      .map(v => {
+        const count = s.dist[v];
+        const b = SCORE_BADGES[v];
+        return `<span class="score-badge score-badge-${v}" onclick="showBadgeInfo(event,'${v}',${count})">${b.emoji} ×${count}</span>`;
+      }).join('');
 
     card.innerHTML = `
       <div class="${rowClass}">
@@ -196,7 +218,7 @@ function renderLeaderboard(shouldAnimate = false) {
           ${medal}
           ${avatarImgHTML(s.player, 'player-avatar', true)}
           <span onclick="openProfile('${s.player}', event)" style="cursor:pointer">${s.player}</span>
-          ${fivesBadge}
+          ${badgesHTML}
           <div class="name-right">
             ${sparklineHTML}
             <span class="expand-icon">▾</span>
