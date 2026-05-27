@@ -281,6 +281,19 @@ header {
   font-size: 14px;
 }
 
+.fives-badge {
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 700;
+  background: #3a2e00;
+  color: #f5c518;
+  border: 1px solid #7a6200;
+  border-radius: 10px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .stat-col {
   text-align: right;
 }

@@ -186,6 +186,9 @@ function renderLeaderboard(shouldAnimate = false) {
     }
     card.addEventListener('click', () => toggleDist(card));
 
+    const fiveCount = s.dist['5'] || 0;
+    const fivesBadge = fiveCount >= 5 ? `<span class="fives-badge" title="${fiveCount} fives this month">5️⃣ ×${fiveCount}</span>` : '';
+
     card.innerHTML = `
       <div class="${rowClass}">
         ${rankLabel}
@@ -193,6 +196,7 @@ function renderLeaderboard(shouldAnimate = false) {
           ${medal}
           ${avatarImgHTML(s.player, 'player-avatar', true)}
           <span onclick="openProfile('${s.player}', event)" style="cursor:pointer">${s.player}</span>
+          ${fivesBadge}
           <div class="name-right">
             ${sparklineHTML}
             <span class="expand-icon">▾</span>
