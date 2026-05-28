@@ -1,18 +1,18 @@
 // --- Score badges ---
 const SCORE_BADGES = {
-  '1': { emoji: '🎯', desc: n => `${n}× score of 1 — hole-in-one machine` },
-  '2': { emoji: '⚡', desc: n => `${n}× score of 2 — consistently electric` },
-  '3': { emoji: '✨', desc: n => `${n}× score of 3 — sharp solver` },
-  '4': { emoji: '🎲', desc: n => `${n}× score of 4 — steady` },
-  '5': { emoji: '😬', desc: n => `${n}× score of 5 — the grind is real` },
-  '6': { emoji: '😅', desc: n => `${n}× score of 6 — living on the edge` },
-  'X': { emoji: '💀', desc: n => `${n}× failed — rough month` },
+  '1': { label: 'ACES',    desc: n => `${n} holes-in-one. Are you even human?` },
+  '2': { label: 'EAGLES',  desc: n => `${n} eagles. The leaderboard doesn\'t deserve you.` },
+  '3': { label: 'BIRDIES', desc: n => `${n} birdies. Locked in and cooking.` },
+  '4': { label: 'PARS',    desc: n => `${n} pars. Right down the middle, no drama.` },
+  '5': { label: 'BOGEYS',  desc: n => `${n} bogeys. You saw the answer and still took 5.` },
+  '6': { label: 'DOUBLES', desc: n => `${n} doubles. The last guess is always the right one.` },
+  'X': { label: 'DNFs',    desc: n => `${n} DNFs. The Wordle has claimed its victim.` },
 };
 
 function showBadgeInfo(event, score, count) {
   event.stopPropagation();
   const b = SCORE_BADGES[score];
-  showToast(`${b.emoji} ${b.desc(count)}`);
+  showToast(`${b.desc(count)}`);
 }
 
 // --- Monthly points ---
@@ -208,7 +208,7 @@ function renderLeaderboard(shouldAnimate = false) {
       .map(v => {
         const count = s.dist[v];
         const b = SCORE_BADGES[v];
-        return `<span class="score-badge score-badge-${v}" onclick="showBadgeInfo(event,'${v}',${count})">${b.emoji} ×${count}</span>`;
+        return `<span class="score-badge score-badge-${v}" onclick="showBadgeInfo(event,'${v}',${count})">${count} ${b.label}</span>`;
       }).join('');
 
     card.innerHTML = `
