@@ -1,4 +1,10 @@
 function switchTab(name, btn) {
+  const now = new Date();
+  if (name === 'submit' && now >= HIATUS_START && now < HIATUS_END) {
+    document.getElementById('hiatus-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -77,6 +83,7 @@ fetchScores();
 subscribeToScores();
 checkHash();
 loadAvatars();
+checkHiatus();
 
 // Position tab indicator on load without transition
 const _initTab = document.querySelector('.tab.active');
@@ -332,4 +339,50 @@ function closeCelebration() {
   document.getElementById('celebration-overlay').classList.remove('active');
   document.body.style.overflow = '';
   if (_congratsChannel) { supabase.removeChannel(_congratsChannel); _congratsChannel = null; }
+}
+
+// --- Hiatus: Aug 31 – Sep 2 2026, lifts at midnight Sep 3 ---
+const HIATUS_START = new Date('2026-08-31T00:00:00');
+const HIATUS_END   = new Date('2026-09-03T00:00:00'); // exclusive
+
+function checkHiatus() {
+  const now = new Date();
+  if (now < HIATUS_START || now >= HIATUS_END) return;
+  document.getElementById('hiatus-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  updateHiatusCountdown();
+  setInterval(updateHiatusCountdown, 1000);
+}
+
+function updateHiatusCountdown() {
+  const diff = HIATUS_END - new Date();
+  if (diff <= 0) {
+    document.getElementById('hiatus-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('h-days').textContent  = String(d).padStart(2, '0');
+  document.getElementById('h-hours').textContent = String(h).padStart(2, '0');
+  document.getElementById('h-mins').textContent  = String(m).padStart(2, '0');
+  document.getElementById('h-secs').textContent  = String(s).padStart(2, '0');
+}
+
+function hiatusViewLeaderboard() {
+  document.getElementById('hiatus-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+  // Re-show if they try to navigate to submit tab
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (new Date() >= HIATUS_START && new Date() < HIATUS_END) {
+        if (this.textContent.trim() === 'SUBMIT SCORE') {
+          document.getElementById('hiatus-overlay').classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+    }, { once: false });
+  });
 }

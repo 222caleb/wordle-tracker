@@ -228,6 +228,29 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Hiatus overlay -->
+<div id="hiatus-overlay" class="hiatus-overlay">
+  <div class="hiatus-label">Family Wordle · 2026</div>
+  <div class="hiatus-tiles">
+    <div class="hiatus-tile" style="background:#3a3a3c"></div>
+    <div class="hiatus-tile" style="background:#538d4e"></div>
+    <div class="hiatus-tile" style="background:#b59f3b"></div>
+    <div class="hiatus-tile" style="background:#538d4e"></div>
+    <div class="hiatus-tile" style="background:#538d4e"></div>
+  </div>
+  <div class="hiatus-title">SEE YOU THURSDAY</div>
+  <div class="hiatus-sub">Taking a quick break — back Sept 3rd</div>
+  <div class="hiatus-countdown-label">Competition resumes in</div>
+  <div class="hiatus-countdown">
+    <div class="hiatus-unit"><div class="hiatus-num" id="h-days">--</div><div class="hiatus-unit-label">days</div></div>
+    <div class="hiatus-unit"><div class="hiatus-num" id="h-hours">--</div><div class="hiatus-unit-label">hours</div></div>
+    <div class="hiatus-unit"><div class="hiatus-num" id="h-mins">--</div><div class="hiatus-unit-label">min</div></div>
+    <div class="hiatus-unit"><div class="hiatus-num" id="h-secs">--</div><div class="hiatus-unit-label">sec</div></div>
+  </div>
+  <div class="hiatus-footer">Scores locked · Leaderboard still viewable</div>
+  <button class="hiatus-peek-btn" onclick="hiatusViewLeaderboard()">VIEW LEADERBOARD →</button>
+</div>
+
 <!-- Profile overlay -->
 <div id="profile-overlay" class="profile-overlay" onclick="if(event.target===this)closeProfile()">
   <div class="profile-modal">
@@ -283,7 +306,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/data.js"></script>

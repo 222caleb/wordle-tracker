@@ -2268,3 +2268,118 @@ a.history-wordle:hover {
 
 .avatar-picker-actions .submit-btn,
 .avatar-picker-actions .cancel-btn { flex: 1; }
+
+/* ===== HIATUS OVERLAY ===== */
+.hiatus-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 2rem;
+}
+.hiatus-overlay.active { display: flex; }
+
+.hiatus-tiles {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.hiatus-tile {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+}
+
+.hiatus-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hiatus-title {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.hiatus-sub {
+  font-size: 1rem;
+  color: var(--text2);
+  margin-bottom: 2.5rem;
+}
+
+.hiatus-countdown-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.hiatus-countdown {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hiatus-unit {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  min-width: 70px;
+}
+
+.hiatus-num {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hiatus-unit-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+.hiatus-footer {
+  margin-top: 2.5rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+}
+
+.hiatus-peek-btn {
+  margin-top: 1.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.hiatus-peek-btn:hover { color: var(--text2); border-color: var(--text2); }
