@@ -1,7 +1,7 @@
 const SUPABASE_URL = "https://shwwzovanprmfesgaerr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNod3d6b3ZhbnBybWZlc2dhZXJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNjcwNDEsImV4cCI6MjA5MDY0MzA0MX0.Q3I-EkjE9B6gpikVnhNEyhdkxbjtYCIe7iFreueAV6o";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allScores = [];
 let scoresChannel = null;
