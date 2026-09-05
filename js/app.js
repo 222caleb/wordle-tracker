@@ -1,3 +1,7 @@
+// Hiatus window — Aug 31 through Sep 2 2026 (lifts at midnight Sep 3)
+const HIATUS_START = new Date('2026-08-31T00:00:00');
+const HIATUS_END   = new Date('2026-09-03T00:00:00');
+
 function switchTab(name, btn) {
   const now = new Date();
   if (name === 'submit' && now >= HIATUS_START && now < HIATUS_END) {
@@ -340,10 +344,6 @@ function closeCelebration() {
   document.body.style.overflow = '';
   if (_congratsChannel) { supabase.removeChannel(_congratsChannel); _congratsChannel = null; }
 }
-
-// --- Hiatus: Aug 31 – Sep 2 2026, lifts at midnight Sep 3 ---
-const HIATUS_START = new Date('2026-08-31T00:00:00');
-const HIATUS_END   = new Date('2026-09-03T00:00:00'); // exclusive
 
 function checkHiatus() {
   const now = new Date();
