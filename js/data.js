@@ -6,7 +6,8 @@ async function fetchScores() {
   const { data, error } = await supabase
     .from('scores')
     .select('*')
-    .order('id', { ascending: false });
+    .order('id', { ascending: false })
+    .limit(5000);
   if (!error) {
     allScores = data || [];
     renderAll();
