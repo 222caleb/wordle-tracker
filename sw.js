@@ -1,4 +1,4 @@
-const CACHE = 'wordle-dordle-v1';
+const CACHE = 'wordle-dordle-v2';
 const PRECACHE = [
   '/',
   '/index.html',
