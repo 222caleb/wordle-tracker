@@ -3,16 +3,22 @@ function loadData() { return allScores; }
 
 let _celebrationChecked = false;
 async function fetchScores() {
-  const { data, error } = await supabase
-    .from('scores')
-    .select('*')
-    .order('id', { ascending: false })
-    .limit(5000);
-  if (!error) {
-    allScores = data || [];
-    renderAll();
-    if (!_celebrationChecked) { _celebrationChecked = true; checkCelebration(); }
+  const PAGE = 1000;
+  let all = [], from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from('scores')
+      .select('*')
+      .order('id', { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error || !data || !data.length) break;
+    all = all.concat(data);
+    if (data.length < PAGE) break;
+    from += PAGE;
   }
+  allScores = all;
+  renderAll();
+  if (!_celebrationChecked) { _celebrationChecked = true; checkCelebration(); }
 }
 
 function subscribeToScores() {
